@@ -3,7 +3,7 @@ import string
 from BeautifulSoup import NavigableString, BeautifulSoup as bs
 import re
 
-class fetch:
+class album_metadata:
 	content = bs()
 	allmusicMetadata = {}
 	rymMetadata = {}
@@ -47,7 +47,7 @@ class fetch:
 		# Parse the rating out of its <span> tag.
 		rating = self.content.findAll("span", {"itemprop" :"rating"})
 		rating = rating[0].findAll(text = True) # Remove tags
-		rating = rating[0]
+		rating = rating[0] + "/5"
 
 		# Parse the review out of its <span> tag.
 		review = self.content.findAll("span", {"itemprop" :"description"})
@@ -101,7 +101,7 @@ class fetch:
 		return self.discogsMetadata
 
 if __name__ == "__main__":
-	a = fetch()
+	a = album_metadata()
 	b = a.imFeelingLucky('abbey road the beatles', 'allmusic')
 	a.allmusic_parse(b)
 	b = a.imFeelingLucky('abbey road the beatles', 'rateyourmusic')
