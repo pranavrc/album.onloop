@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Check that album out.</title>
+<link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<div class="formDiv">
+<form id="userform" action="" onsubmit="return submitForm();">
+<fieldset>
+<input class="submitText" type="text" name="name" />
+<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm();" />
+</fieldset>
+<hr />
+</form>
+</div>
+
+<div class="myDiv">Lore.</div>
+
+<hr />
+
+<p style="text-align:center;">
+<a href="http://soundcloud.com/studiomurk/" onclick="window.open(this.href);return false;">My Soundcloud</a> | <a href="mailto:prp.1111@gmail.com">Mail</a> | <a href="http://github.com/pranavrc/SC-irclejerk/" onclick="window.open(this.href);return false;">Fork</a> | <a href="https://getsatisfaction.com/soundcloud/topics/anti_fake_spam_followers_maximum_number_of_follows_per_day" title="For Soundcloud users who are tired of promotional follows, spam comments and fake listens." onclick="window.open(this.href);return false;">What?</a>
+</p>
+
+<p><br /></p>
+
+<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.7.2.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.watermarkinput.js') }}"></script>
+<script type="text/javascript">
+	/*<![CDATA[*/
+	function submitForm() {
+		$('div.myDiv').html('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />'); 
+    		$.ajax({type:'POST', url: '/', data:$('#userform').serialize(), success: function(response) {
+        		$('div.myDiv').html(response);
+    		}});
+
+	    return false;
+       }
+
+       $(document).ready(function(){
+                jQuery(function($){
+	        $('.submitText').Watermark("Album search (Eg.,london calling the clash)");
+		});
+		
+    		$(".submitBtn").attr("disabled", "true");
+		$(".submitText").keyup(function(){
+	        if ($(this).val() != "") {
+        	    $(".submitBtn").removeAttr("disabled");
+	        } else {
+	            $(".submitBtn").attr("disabled", "true");        
+	        }
+	       });    
+	});
+	/*]]>*/
+</script>
+
+</body>
+</html>
