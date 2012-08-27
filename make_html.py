@@ -3,13 +3,13 @@ from album_metadata import *
 def make_html(userRequest):
 	albumInfo = album_metadata()
 	
-	htmlfoo = albumInfo.imFeelingLucky(userRequest, 'allmusic')
+	htmlfoo = albumInfo.search(userRequest, 'allmusic')
 	albumInfo.allmusic_parse(htmlfoo)
 
-	htmlfoo = albumInfo.imFeelingLucky(userRequest, 'rateyourmusic')
+	htmlfoo = albumInfo.search(userRequest, 'rateyourmusic')
 	albumInfo.rym_parse(htmlfoo)
 
-	htmlfoo = albumInfo.imFeelingLucky(userRequest, 'discogs')
+	htmlfoo = albumInfo.search(userRequest, 'discogs')
 	albumInfo.discogs_parse(htmlfoo)
 
 	#print albumInfo.allmusicMetadata
@@ -19,7 +19,12 @@ def make_html(userRequest):
 	#print albumInfo.discogsMetadata
 
 	linebreak = "<hr />"
-	html = "<h3>Allmusic</h3>" + "<b>" + albumInfo.allmusicMetadata['rating'] + "</b>" + "<br />" + "<i>" + albumInfo.allmusicMetadata['review'][0] + "</i>"
+	try:
+		html = "<h3>Allmusic</h3>" + "<b>" + albumInfo.allmusicMetadata['rating'].decode('utf-8') + "</b>" + "<br />" + "<i>" + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + "</i>"
+	except KeyError:
+		return 'Could not fetch content.'
+	except UnicodeDecodeError:
+		make_html(userRequest)
 
 	return html
 
