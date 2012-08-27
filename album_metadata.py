@@ -11,6 +11,7 @@ class album_metadata:
 	allmusicMetadata = {}
 	rymMetadata = {}
 	discogsMetadata = {}
+	songList = []
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -101,8 +102,8 @@ class album_metadata:
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review] # Remove tags
 
 			# List of songs in the album
-			songList = self.content.findAll("a", {"class" :"primary_link"})
-			songList = [song.findAll(text = True)[0] for song in songList]
+			self.songList = self.content.findAll("a", {"class" :"primary_link"})
+			self.songList = [song.findAll(text = True)[0] for song in self.songList]
 		
 			# Populate the metadata dictionary.
 			self.allmusicMetadata = {'rating': rating, 'review': review}
@@ -161,7 +162,7 @@ if __name__ == "__main__":
 	a = album_metadata()
 	stringo = "sgt. pepper's lonely hearts club band"
 	b = a.search(stringo, "allmusic")
-	#a.allmusic_parse(b)
+	a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
 	#a.rym_parse(b)
