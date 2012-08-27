@@ -1,4 +1,6 @@
 from album_metadata import *
+from random import choice
+from yt_fetch import *
 
 def make_html(userRequest):
 	albumInfo = album_metadata()
@@ -11,6 +13,8 @@ def make_html(userRequest):
 
 	htmlfoo = albumInfo.search(userRequest, 'discogs')
 	albumInfo.discogs_parse(htmlfoo)
+
+	randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList))
 
 	#print albumInfo.allmusicMetadata
 	#print
