@@ -13,8 +13,11 @@ def make_html(userRequest):
 
 	htmlfoo = albumInfo.search(userRequest, 'discogs')
 	albumInfo.discogs_parse(htmlfoo)
-
-	randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList))
+	
+	try:
+		randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
+	except:
+		randomSongChosen = ""
 
 	#print albumInfo.allmusicMetadata
 	#print
@@ -22,15 +25,29 @@ def make_html(userRequest):
 	#print
 	#print albumInfo.discogsMetadata
 
-	linebreak = "<hr />"
+	linebreak = "<br />"
+	hrline = "<hr />"
+	
 	try:
-		html = "<h3>Allmusic</h3>" + "<b>" + albumInfo.allmusicMetadata['rating'].decode('utf-8') + "</b>" + "<br />" + "<i>" + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + "</i>"
-	except KeyError:
-		return 'Could not fetch content.'
-	except UnicodeDecodeError:
-		make_html(userRequest)
+		allmusicMarkup = "<b>Allmusic" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+	except (KeyError, IndexError) as e:
+		allmusicMarkup = 'Could not fetch content.'
+
+	try:
+		rymMarkup = "<b>Rate Your Music" + " - " + albumInfo.rymMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.rymMetadata['review'][0].decode('utf-8') + '"' + linebreak + linebreak + '"' + albumInfo.rymMetadata['review'][1].decode('utf-8') + '"' + "</i>"
+	except (KeyError, IndexError) as e:
+		rymMarkup = 'Could not fetch content.'
+
+	try:
+		discogsMarkup = "<b>Discogs" + " - " + albumInfo.discogsMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.discogsMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+	except (KeyError, IndexError) as e:
+		discogsMarkup = 'Could not fetch content.'
+
+	youtubeEmbed = '<iframe width="420" height="345" src="http://www.youtube.com/embed/' + randomSongChosen + '"></iframe>'
+
+	html = allmusicMarkup + hrline + rymMarkup + hrline + discogsMarkup + hrline + youtubeEmbed
 
 	return html
 
 if __name__ == "__main__":
-	print make_html('abbey road the beatles')
+	print make_html('village green preservation society the kinks')
