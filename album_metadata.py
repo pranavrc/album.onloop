@@ -4,6 +4,7 @@ import urlparse, urllib2
 import string
 from BeautifulSoup import NavigableString, BeautifulSoup as bs
 import re
+import socket
 
 class album_metadata:
 	content = bs()
@@ -11,7 +12,7 @@ class album_metadata:
 	rymMetadata = {}
 	discogsMetadata = {}
 
-	def imFeelingLucky(self, searchString, contentSite):
+	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
@@ -20,23 +21,66 @@ class album_metadata:
 		user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
 		headers = {'User-Agent':user_agent,}
 
-		# Choosing between hyperlink search (site:foo.com) and general search.
-		if (searchString.find(".") != -1):
-			url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+site:" + contentSite
-		else:
-			url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+" + contentSite
-		
-		# Properly encode special characters in url.
-		url = urllib2.quote(url, safe = ":/?&+=")
+		url = self.pick_url(searchString, contentSite, True)
+		response = self.open_url(url, headers)
+		isValidUrl = response.geturl()
+		print isValidUrl
 
-		# Make request and fetch the webpage.
-		request = urllib2.Request(url, None, headers)
-		response = urllib2.urlopen(request)
+		while True:
+			if isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1:
+				break
+			else:
+				url = self.pick_url(searchString, contentSite, False)
+				response = self.open_url(url, headers)
+				firstMatchingUrl = self.fallback_search(bs(response.read()))
+				response = self.open_url(firstMatchingUrl, headers)
+				isValidUrl = response.geturl()
+
 		data = response.read()
 
 		# BeautifulSouping the webpage.
 		self.content = bs(data)
 		return self.content
+
+	def fallback_search(self, searchResult):
+		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
+		rs = re.compile("(.*)(release|album)(.*)");
+		url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
+		return url
+	
+	def pick_url(self, searchString, contentSite, imFeelingLucky):
+		''' Pick between advanced search and normal search. '''
+		# Toggle the I'm Feeling Lucky search option.
+		if imFeelingLucky:
+			# Choosing between hyperlink search (site:foo.com) and general search.
+			if (contentSite.find(".") != -1):
+				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+site:" + contentSite
+			else:
+				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+" + contentSite
+		else:
+			if (contentSite.find(".") != -1):
+				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + searchString + "+site:" + contentSite
+			else:
+				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + searchString + "+" + contentSite
+		return url
+
+	def open_url(self, url, headers):
+		''' Return contents of url. '''
+		# Properly encode special characters in url.
+		url = urllib2.quote(url, safe = ":/?&+=")
+
+		# Make request and fetch the webpage..
+		request = urllib2.Request(url, None, headers)
+		try:
+			response = urllib2.urlopen(request)
+		except urllib2.HTTPError, e:
+			return 'Oops, HTTPError.'
+		except urllib2.URLError, e:
+			if isinstance(e.reason, socket.timeout):
+				return 'Timed out.'
+			return 'URL Error.'
+
+		return response
 
 	def strip_tags(self, html):
 		''' Strips tags out of the html. '''
@@ -46,38 +90,45 @@ class album_metadata:
 	def allmusic_parse(self, allmusicSoup):
 		''' Parse the scraped Allmusic data. '''
 
-		# Parse the rating out of its <span> tag.
-		rating = self.content.findAll("span", {"itemprop" :"rating"})
-		rating = rating[0].findAll(text = True) # Remove tags
-		rating = rating[0] + "/5"
+		try:
+			# Parse the rating out of its <span> tag.
+			rating = self.content.findAll("span", {"itemprop" :"rating"})
+			rating = rating[0].findAll(text = True) # Remove tags
+			rating = rating[0] + "/5"
 
-		# Parse the review out of its <span> tag.
-		review = self.content.findAll("span", {"itemprop" :"description"})
-		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review] # Remove tags
+			# Parse the review out of its <span> tag.
+			review = self.content.findAll("span", {"itemprop" :"description"})
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review] # Remove tags
 
-		# List of songs in the album
-		songList = self.content.findAll("a", {"class" :"primary_link"})
-		songList = [song.findAll(text = True)[0] for song in songList]
+			# List of songs in the album
+			songList = self.content.findAll("a", {"class" :"primary_link"})
+			songList = [song.findAll(text = True)[0] for song in songList]
 		
-		# Populate the metadata dictionary.
-		self.allmusicMetadata = {'rating': rating, 'review': review}
+			# Populate the metadata dictionary.
+			self.allmusicMetadata = {'rating': rating, 'review': review}
+		except IndexError:
+			return 'Could not fetch content.'
+
 		return self.allmusicMetadata 
 		
 	def rym_parse(self, rymSoup):
 		''' Parse the scraped RateYourMusic data. '''
 
-		rating = self.content.findAll("span", {"style" :"font-size:1.3em;font-weight:bold;"})
-		rating = rating[0].findAll(text = True)
-		
-		ratingCount = self.content.findAll("a", {"href" :"#ratings"})
-		ratingCount = ratingCount[0].findAll(text = True)
+		try:
+			rating = self.content.findAll("span", {"style" :"font-size:1.3em;font-weight:bold;"})
+			rating = rating[0].findAll(text = True)
+			
+			ratingCount = self.content.findAll("a", {"href" :"#ratings"})
+			ratingCount = ratingCount[0].findAll(text = True)
 
-		rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
+			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
 
-		review = self.content.findAll("td", {"style" :"padding:25px 50px 50px 50px;"}, limit = 2)
-		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
-		
-		self.rymMetadata = {'rating': rating, 'review': review}
+			review = self.content.findAll("td", {"style" :"padding:25px 50px 50px 50px;"}, limit = 2)
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+			
+			self.rymMetadata = {'rating': rating, 'review': review}
+		except IndexError:
+			return 'Could not fetch content.'
 
 		return self.rymMetadata
 
@@ -85,34 +136,39 @@ class album_metadata:
 		''' Parse the scraped Discogs data. '''
 
 		# Hacking around the varying span class attributes for every document with regex.
-		rg = re.compile("(rating_value)(\\s+)(rating)(_)(value)(_)(r)(\\d+)", re.IGNORECASE|re.DOTALL)
-		rating = self.content.findAll("span", {"class" :rg})
-		rating = rating[0].findAll(text = True)
+		try:
+			rg = re.compile("(rating_value)(\\s+)(rating)(_)(value)(_)(r)(\\d+)", re.IGNORECASE|re.DOTALL)
+			
+			rating = self.content.findAll("span", {"class" :rg})
+			rating = rating[0].findAll(text = True)
 
-		rc = re.compile("(rating)(_)(count)(_)(r)(\\d+)", re.IGNORECASE|re.DOTALL)
-		ratingCount = self.content.findAll("span", {"class" :rc})
-		ratingCount = ratingCount[0].findAll(text = True)
+			rc = re.compile("(rating)(_)(count)(_)(r)(\\d+)", re.IGNORECASE|re.DOTALL)
+			ratingCount = self.content.findAll("span", {"class" :rc})
+			ratingCount = ratingCount[0].findAll(text = True)
 
-		rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
+			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
 		
-		review = self.content.findAll("div", {"class": "squish_lines_8 comment group"})
-		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+			review = self.content.findAll("div", {"class": "squish_lines_8 comment group"})
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
-		self.discogsMetadata = {'rating': rating, 'review': review}
+			self.discogsMetadata = {'rating': rating, 'review': review}
+		except IndexError:
+			return 'Could not fetch content.'
 
 		return self.discogsMetadata
 
 if __name__ == "__main__":
 	a = album_metadata()
-	b = a.imFeelingLucky('abbey road the beatles', 'allmusic')
-	a.allmusic_parse(b)
-	b = a.imFeelingLucky('abbey road the beatles', 'rateyourmusic')
+	stringo = "sgt. pepper's lonely hearts club band"
+	b = a.search(stringo, "allmusic")
+	#a.allmusic_parse(b)
+	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
-	a.rym_parse(b)
-	b = a.imFeelingLucky('abbey road the beatles', 'discogs')
-	a.discogs_parse(b)
-	print a.allmusicMetadata
-	print
-	print a.rymMetadata
-	print
-	print a.discogsMetadata
+	#a.rym_parse(b)
+	#b = a.search('abbey road the beatles', 'discogs')
+	#a.discogs_parse(b)
+	#print a.allmusicMetadata
+	#print
+	#print a.rymMetadata
+	#print
+	#print a.discogsMetadata
