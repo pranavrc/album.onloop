@@ -28,14 +28,17 @@ class album_metadata:
 		print isValidUrl
 
 		while True:
-			if isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1:
+			if isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1:
 				break
 			else:
 				url = self.pick_url(searchString, contentSite, False)
 				response = self.open_url(url, headers)
 				firstMatchingUrl = self.fallback_search(bs(response.read()))
 				response = self.open_url(firstMatchingUrl, headers)
-				isValidUrl = response.geturl()
+				try:
+					isValidUrl = response.geturl()
+				except AttributeError:
+					return ""
 
 		data = response.read()
 
@@ -46,7 +49,10 @@ class album_metadata:
 	def fallback_search(self, searchResult):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
 		rs = re.compile("(.*)(release|album)(.*)");
-		url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
+		try:
+			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
+		except IndexError:
+			url = ""
 		return url
 	
 	def pick_url(self, searchString, contentSite, imFeelingLucky):
@@ -80,6 +86,8 @@ class album_metadata:
 			if isinstance(e.reason, socket.timeout):
 				return 'Timed out.'
 			return 'URL Error.'
+		except ValueError:
+			return 'Invalid URL.'
 
 		return response
 
@@ -97,18 +105,30 @@ class album_metadata:
 			rating = rating[0].findAll(text = True) # Remove tags
 			rating = rating[0] + "/5"
 
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+
+		try:
 			# Parse the review out of its <span> tag.
 			review = self.content.findAll("span", {"itemprop" :"description"})
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review] # Remove tags
 
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = [""]
+
+		try:
 			# List of songs in the album
 			self.songList = self.content.findAll("a", {"class" :"primary_link"})
 			self.songList = [song.findAll(text = True)[0] for song in self.songList]
-		
-			# Populate the metadata dictionary.
-			self.allmusicMetadata = {'rating': rating, 'review': review}
 		except IndexError:
-			return 'Could not fetch content.'
+			self.songList = []
+		
+		# Populate the metadata dictionary.
+		self.allmusicMetadata = {'rating': rating, 'review': review}
 
 		return self.allmusicMetadata 
 		
@@ -118,18 +138,26 @@ class album_metadata:
 		try:
 			rating = self.content.findAll("span", {"style" :"font-size:1.3em;font-weight:bold;"})
 			rating = rating[0].findAll(text = True)
-			
+
 			ratingCount = self.content.findAll("a", {"href" :"#ratings"})
 			ratingCount = ratingCount[0].findAll(text = True)
-
 			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
 
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+			
+		try:	
 			review = self.content.findAll("td", {"style" :"padding:25px 50px 50px 50px;"}, limit = 2)
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
-			
-			self.rymMetadata = {'rating': rating, 'review': review}
+
+			if not review:
+				raise IndexError
 		except IndexError:
-			return 'Could not fetch content.'
+			review = ["", ""]
+			
+		self.rymMetadata = {'rating': rating, 'review': review}
 
 		return self.rymMetadata
 
@@ -148,28 +176,37 @@ class album_metadata:
 			ratingCount = ratingCount[0].findAll(text = True)
 
 			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
-		
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+
+		try:		
 			review = self.content.findAll("div", {"class": "squish_lines_8 comment group"})
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
-			self.discogsMetadata = {'rating': rating, 'review': review}
+			if not review:
+				raise IndexError
 		except IndexError:
-			return 'Could not fetch content.'
+			review = [""]
+
+		self.discogsMetadata = {'rating': rating, 'review': review}
 
 		return self.discogsMetadata
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "sgt. pepper's lonely hearts club band"
-	b = a.search(stringo, "allmusic")
-	a.allmusic_parse(b)
+	stringo = "village green preservation society the kinks"
+	b = a.search(stringo, "discogs")
+	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
-	#a.discogs_parse(b)
+	a.discogs_parse(b)
 	#print a.allmusicMetadata
 	#print
 	#print a.rymMetadata
 	#print
-	#print a.discogsMetadata
+	print a.discogsMetadata
