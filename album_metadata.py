@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import urlparse, urllib2
 import string
 from BeautifulSoup import NavigableString, BeautifulSoup as bs
@@ -51,7 +53,7 @@ class album_metadata:
 
 		# Parse the review out of its <span> tag.
 		review = self.content.findAll("span", {"itemprop" :"description"})
-		review = [self.strip_tags(str(eachReview)).strip('\n') for eachReview in review] # Remove tags
+		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review] # Remove tags
 
 		# List of songs in the album
 		songList = self.content.findAll("a", {"class" :"primary_link"})
@@ -73,7 +75,7 @@ class album_metadata:
 		rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
 
 		review = self.content.findAll("td", {"style" :"padding:25px 50px 50px 50px;"}, limit = 2)
-		review = [self.strip_tags(str(eachReview)).strip('\n') for eachReview in review]
+		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 		
 		self.rymMetadata = {'rating': rating, 'review': review}
 
@@ -94,7 +96,7 @@ class album_metadata:
 		rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
 		
 		review = self.content.findAll("div", {"class": "squish_lines_8 comment group"})
-		review = [self.strip_tags(str(eachReview)).strip('\n') for eachReview in review]
+		review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
 		self.discogsMetadata = {'rating': rating, 'review': review}
 
