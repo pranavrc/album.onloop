@@ -11,10 +11,10 @@
 <body>
 
 <div class="formDiv">
-<form id="userform" action="" onsubmit="return submitForm();">
+<form id="userform" action="" onsubmit="return submitForm(1);">
 <fieldset>
 <input class="submitText" type="text" name="name" />
-<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm();" />
+<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm(1);" />
 </fieldset>
 <hr />
 </form>
@@ -34,16 +34,21 @@
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.watermarkinput.js') }}"></script>
 <script type="text/javascript">
 	/*<![CDATA[*/
-	function submitForm() {
-		$('div.myDiv').html('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />'); 
-    		$.ajax({type:'POST', url: '/', data:$('#userform').serialize(), success: function(response) {
-        		$('div.myDiv').html(response);
-    		}});
+	function submitForm(count) {
+		if (count == 1) $('div.myDiv').html('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
+		else $('div.myDiv').append('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
 
+		$.ajax({type:'POST', url: '/', data:$('#userform').serialize() + "&count=" + count, success: function(response) {
+				if (count == 1) { $('div.myDiv').html(response); }
+				else { $('img').replaceWith(response); }
+				count++;
+				if (count <= 4) submitForm(count);
+		}});
+				
 	    return false;
-       }
+        }
 
-       $(document).ready(function(){
+	$(document).ready(function(){
                 jQuery(function($){
 	        $('.submitText').Watermark("Album search (Eg.,london calling the clash)");
 		});
