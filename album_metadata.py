@@ -25,7 +25,6 @@ class album_metadata:
 		url = self.pick_url(searchString, contentSite, True)
 		response = self.open_url(url, headers)
 		isValidUrl = response.geturl()
-		print isValidUrl
 
 		while True:
 			if isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1:
