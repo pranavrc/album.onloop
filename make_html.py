@@ -5,7 +5,7 @@ from yt_fetch import *
 def make_html(userRequest, urlCount):
 	albumInfo = album_metadata()
 
-	loadergif = "<img src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
+	loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
 	linebreak = "<br />"
 	hrline = "<hr />"
 	
@@ -43,6 +43,17 @@ def make_html(userRequest, urlCount):
 		html = discogsMarkup + hrline
 
 	elif urlCount == 4:
+		htmlfoo = albumInfo.search(userRequest, 'itunes')
+		albumInfo.itunes_parse(htmlfoo)
+
+		try:
+			itunesMarkup = "<b>iTunes Store" + " - " + albumInfo.itunesMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.itunesMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+		except (KeyError, IndexError) as e:
+			itunesMarkup = 'Could not fetch content.'
+
+		html = itunesMarkup + hrline
+
+	elif urlCount == 5:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
 		albumInfo.allmusic_parse(htmlfoo)
 
@@ -66,4 +77,4 @@ def make_html(userRequest, urlCount):
 	return html
 
 if __name__ == "__main__":
-	print make_html('village green preservation society the kinks', 1)
+	print make_html('london calling', 4)
