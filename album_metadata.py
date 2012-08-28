@@ -11,6 +11,9 @@ class album_metadata:
 	allmusicMetadata = {}
 	rymMetadata = {}
 	discogsMetadata = {}
+	itunesMetadata = {}
+	pitchforkMetadata = {}
+	sputnikmusicMetadata = {}
 	songList = []
 
 	def search(self, searchString, contentSite):
@@ -194,18 +197,56 @@ class album_metadata:
 
 		return self.discogsMetadata
 
+	def itunes_parse(self, itunesSoup):
+		''' Parse the scraped iTunes Store data. '''
+		
+		try:
+			rg = re.compile("(.+)(\\s+)(stars)(,)(\\s+)(.+)(\\s+)(Ratings)")
+			
+			rating = self.content.findAll("div", {"aria-label" :rg})[0].get("aria-label")
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+
+		try:
+			review = self.content.findAll("div", {"class" :"product-review"})
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = [""]
+
+		self.itunesMetadata = {'rating': rating, 'review': review}
+		
+		return self.itunesMetadata
+
+	def pitchfork_parse(self, pitchforkSoup):
+		''' Parse the scraped Pitchfork data. '''
+
+		pass
+
+	def sputnikmusic_parse(self, sputnikmusicSoup):
+		''' Parse the scraped Sputnikmusic data. '''
+
+		pass
+
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "village green preservation society the kinks"
-	b = a.search(stringo, "discogs")
+	stringo = "marquee moon"
+	b = a.search(stringo, "itunes")
 	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
-	a.discogs_parse(b)
+	#a.discogs_parse(b)
 	#print a.allmusicMetadata
 	#print
 	#print a.rymMetadata
 	#print
-	print a.discogsMetadata
+	#print a.discogsMetadata
+	a.itunes_parse(b)
+	print a.itunesMetadata
