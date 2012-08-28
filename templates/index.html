@@ -9,18 +9,19 @@
 </head>
 
 <body>
+<p style="text-align:center;"><a href="http://album.onloop.net/"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="album.onloop" /></a></p>
 
 <div class="formDiv">
-<form id="userform" action="" onsubmit="return submitForm(1);">
+<form id="userform" action="" onsubmit="return submitForm(1, 5);">
 <fieldset>
 <input class="submitText" type="text" name="name" />
-<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm(1);" />
+<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm(1, 5);" />
 </fieldset>
 <hr />
 </form>
 </div>
 
-<div class="myDiv">Lore.</div>
+<div class="myDiv">Content aggregator for Music Albums.<br /><i>Thanks to Google Search, Allmusic, RateYourMusic, Discogs, iTunes Store.</i></div>
 
 <hr />
 
@@ -34,15 +35,17 @@
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.watermarkinput.js') }}"></script>
 <script type="text/javascript">
 	/*<![CDATA[*/
-	function submitForm(count) {
-		if (count == 1) $('div.myDiv').html('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
-		else $('div.myDiv').append('<img src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
+	function submitForm(count, maxCount) {
+		if (count == 1) $('div.myDiv').html('<img class="loader" src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
+		else $('div.myDiv').append('<img class="loader" src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
 
 		$.ajax({type:'POST', url: '/', data:$('#userform').serialize() + "&count=" + count, success: function(response) {
 				if (count == 1) { $('div.myDiv').html(response); }
-				else { $('img').replaceWith(response); }
+				else { $('img.loader').replaceWith(response); }
 				count++;
-				if (count <= 4) submitForm(count);
+				if (count <= maxCount) {
+					submitForm(count, maxCount);
+				}
 		}});
 				
 	    return false;
