@@ -12,7 +12,8 @@ def index():
 		return render_template('index.html')
 	if request.method == 'POST':
 		username = request.form['name']
-		return make_html(username)
+		count = request.form['count']
+		return make_html(username, int(count))
 
 if __name__ == "__main__":
 	app.run(debug = True)
