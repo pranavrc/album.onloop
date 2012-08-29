@@ -21,11 +21,11 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 		metadata = albumInfo.itunesMetadata
 
 	try:
-		ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + "-" + metadata['rating'].decode('utf-8') + linebreak + "<i>"
+		ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
 		print ratingMarkup
 		reviewMarkup = ""
 		for eachReview in metadata['review']:
-			reviewMarkup = reviewMarkup + linebreak + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
+			reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
 		markup = ratingMarkup + reviewMarkup
 	except:
 		markup = "Oops, content not found."
@@ -42,49 +42,16 @@ def make_html(userRequest, urlCount):
 	hrline = "<hr />"
 	
 	if urlCount == 1:
-		#htmlfoo = albumInfo.search(userRequest, 'allmusic')
-		#albumInfo.allmusic_parse(htmlfoo)
-
-		#try:
-		#	allmusicMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Allmusic</b>" + "</a>" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
-		#except (KeyError, IndexError) as e:
-		#	allmusicMarkup = 'Could not fetch content.'
-	
-		#html = allmusicMarkup + hrline
 		html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse)
 
 	elif urlCount == 2:
-		htmlfoo = albumInfo.search(userRequest, 'rateyourmusic')
-		albumInfo.rym_parse(htmlfoo)
-		
-		try:
-			rymMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Rate Your Music</b>" + "</a>" + " - " + albumInfo.rymMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.rymMetadata['review'][0].decode('utf-8') + '"' + linebreak + linebreak + '"' + albumInfo.rymMetadata['review'][1].decode('utf-8') + '"' + "</i>"
-		except (KeyError, IndexError) as e:
-			rymMarkup = 'Could not fetch content.'
-
-		html = rymMarkup + hrline
+		html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse)
 
 	elif urlCount == 3:
-		htmlfoo = albumInfo.search(userRequest, 'discogs')
-		albumInfo.discogs_parse(htmlfoo)
-		
-		try:
-			discogsMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Discogs</b>" + "</a>" + " - " + albumInfo.discogsMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.discogsMetadata['review'][0].decode('utf-8') + '"' + "</i>"
-		except (KeyError, IndexError) as e:
-			discogsMarkup = 'Could not fetch content.'
-
-		html = discogsMarkup + hrline
+		html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse)
 
 	elif urlCount == 4:
-		htmlfoo = albumInfo.search(userRequest, 'itunes')
-		albumInfo.itunes_parse(htmlfoo)
-
-		try:
-			itunesMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>iTunes Store</b>" + "</a>" + " - " + albumInfo.itunesMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.itunesMetadata['review'][0].decode('utf-8') + '"' + "</i>"
-		except (KeyError, IndexError) as e:
-			itunesMarkup = 'Could not fetch content.'
-
-		html = itunesMarkup + hrline
+		html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse)
 
 	elif urlCount == 5:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
