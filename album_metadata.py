@@ -212,7 +212,13 @@ class album_metadata:
 
 		try:
 			review = self.content.findAll("div", {"class" :"product-review"})
+
+			if not review:
+				review = self.content.findAll("div", {"class" :"customer-review"}, limit = 1)
+
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+
+			review[0] = review[0][13:]
 
 			if not review:
 				raise IndexError
