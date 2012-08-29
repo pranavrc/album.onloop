@@ -21,15 +21,29 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 		metadata = albumInfo.itunesMetadata
 
 	try:
-		ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
-		reviewMarkup = ""
-		for eachReview in metadata['review']:
-			reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
-		markup = ratingMarkup + reviewMarkup
+		if metadata['rating']:
+			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
+		else:
+			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
+
+		if not metadata['review'][0]:
+			reviewMarkup = ""
+		else:
+			reviewMarkup = ""
+			for eachReview in metadata['review']:
+				reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
+
+		if not ratingMarkup and not reviewMarkup:
+			markup = ""
+		else:
+			markup = ratingMarkup + reviewMarkup
 	except:
 		markup = "Oops, content not found."
-
-	html = markup + hrline
+	
+	if not markup:
+		html = "Album not found."
+	else:
+		html = markup + hrline
 
 	return html
 
