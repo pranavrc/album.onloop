@@ -34,11 +34,14 @@
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.watermarkinput.js') }}"></script>
 <script type="text/javascript">
 	/*<![CDATA[*/
+	var formString;
 	function submitForm(count, maxCount) {
 		if (count == 1) $('div.myDiv').html('<img class="loader" src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
 		else $('div.myDiv').append('<img class="loader" src="{{ url_for('static', filename='loader.gif') }}" alt="Fetching..." />');
 
-		$.ajax({type:'POST', url: '/', data:$('#userform').serialize() + "&count=" + count, success: function(response) {
+		if (count == 1) formString = $('#userform').serialize()
+
+		$.ajax({type:'POST', url: '/', data:formString + "&count=" + count, success: function(response) {
 				if (count == 1) { $('div.myDiv').html(response); }
 				else { $('img.loader').replaceWith(response); }
 				count++;
