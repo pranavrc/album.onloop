@@ -14,7 +14,7 @@ def make_html(userRequest, urlCount):
 		albumInfo.allmusic_parse(htmlfoo)
 
 		try:
-			allmusicMarkup = "<b>Allmusic" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+			allmusicMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Allmusic</b>" + "</a>" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
 		except (KeyError, IndexError) as e:
 			allmusicMarkup = 'Could not fetch content.'
 	
@@ -25,7 +25,7 @@ def make_html(userRequest, urlCount):
 		albumInfo.rym_parse(htmlfoo)
 		
 		try:
-			rymMarkup = "<b>Rate Your Music" + " - " + albumInfo.rymMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.rymMetadata['review'][0].decode('utf-8') + '"' + linebreak + linebreak + '"' + albumInfo.rymMetadata['review'][1].decode('utf-8') + '"' + "</i>"
+			rymMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Rate Your Music</b>" + "</a>" + " - " + albumInfo.rymMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.rymMetadata['review'][0].decode('utf-8') + '"' + linebreak + linebreak + '"' + albumInfo.rymMetadata['review'][1].decode('utf-8') + '"' + "</i>"
 		except (KeyError, IndexError) as e:
 			rymMarkup = 'Could not fetch content.'
 
@@ -36,7 +36,7 @@ def make_html(userRequest, urlCount):
 		albumInfo.discogs_parse(htmlfoo)
 		
 		try:
-			discogsMarkup = "<b>Discogs" + " - " + albumInfo.discogsMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.discogsMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+			discogsMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Discogs</b>" + "</a>" + " - " + albumInfo.discogsMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.discogsMetadata['review'][0].decode('utf-8') + '"' + "</i>"
 		except (KeyError, IndexError) as e:
 			discogsMarkup = 'Could not fetch content.'
 
@@ -47,7 +47,7 @@ def make_html(userRequest, urlCount):
 		albumInfo.itunes_parse(htmlfoo)
 
 		try:
-			itunesMarkup = "<b>iTunes Store" + " - " + albumInfo.itunesMetadata['rating'].decode('utf-8') + "</b>" + linebreak + "<i>" + '"' + albumInfo.itunesMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+			itunesMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>iTunes Store</b>" + "</a>" + " - " + albumInfo.itunesMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.itunesMetadata['review'][0].decode('utf-8') + '"' + "</i>"
 		except (KeyError, IndexError) as e:
 			itunesMarkup = 'Could not fetch content.'
 
@@ -61,6 +61,9 @@ def make_html(userRequest, urlCount):
 			randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
 		except:
 			randomSongChosen = ""
+
+		if not randomSongChosen:
+			return "Video not found."
 
 		youtubeEmbed = '<iframe width="420" height="345" src="http://www.youtube.com/embed/' + randomSongChosen + '"></iframe>'
 		
