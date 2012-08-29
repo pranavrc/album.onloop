@@ -1,6 +1,38 @@
 from album_metadata import *
 from random import choice
 from yt_fetch import *
+import string
+
+def markup(userRequest, albumInfo, contentSite, parseFunc):
+	loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
+	linebreak = "<br />"
+	hrline = "<hr />"
+	
+	htmlfoo = albumInfo.search(userRequest, contentSite)
+	parseFunc(htmlfoo)
+	contentSitename = contentSite.lower()
+	if contentSitename == 'allmusic'.lower():
+		metadata = albumInfo.allmusicMetadata
+	elif contentSitename == 'rateyourmusic'.lower():
+		metadata = albumInfo.rymMetadata
+	elif contentSitename == 'discogs'.lower():
+		metadata = albumInfo.discogsMetadata
+	elif contentSitename == 'itunes'.lower():
+		metadata = albumInfo.itunesMetadata
+
+	try:
+		ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + "-" + metadata['rating'].decode('utf-8') + linebreak + "<i>"
+		print ratingMarkup
+		reviewMarkup = ""
+		for eachReview in metadata['review']:
+			reviewMarkup = reviewMarkup + linebreak + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
+		markup = ratingMarkup + reviewMarkup
+	except:
+		markup = "Oops, content not found."
+
+	html = markup + hrline
+
+	return html
 
 def make_html(userRequest, urlCount):
 	albumInfo = album_metadata()
@@ -10,15 +42,16 @@ def make_html(userRequest, urlCount):
 	hrline = "<hr />"
 	
 	if urlCount == 1:
-		htmlfoo = albumInfo.search(userRequest, 'allmusic')
-		albumInfo.allmusic_parse(htmlfoo)
+		#htmlfoo = albumInfo.search(userRequest, 'allmusic')
+		#albumInfo.allmusic_parse(htmlfoo)
 
-		try:
-			allmusicMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Allmusic</b>" + "</a>" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
-		except (KeyError, IndexError) as e:
-			allmusicMarkup = 'Could not fetch content.'
+		#try:
+		#	allmusicMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>Allmusic</b>" + "</a>" + " - " + albumInfo.allmusicMetadata['rating'].decode('utf-8') + linebreak + "<i>" + '"' + albumInfo.allmusicMetadata['review'][0].decode('utf-8') + '"' + "</i>"
+		#except (KeyError, IndexError) as e:
+		#	allmusicMarkup = 'Could not fetch content.'
 	
-		html = allmusicMarkup + hrline
+		#html = allmusicMarkup + hrline
+		html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse)
 
 	elif urlCount == 2:
 		htmlfoo = albumInfo.search(userRequest, 'rateyourmusic')
