@@ -107,7 +107,7 @@ class album_metadata:
 			# Parse the rating out of its <span> tag.
 			rating = self.content.findAll("span", {"itemprop" :"rating"})
 			rating = rating[0].findAll(text = True) # Remove tags
-			rating = rating[0] + "/5"
+			rating = "<b>" + rating[0] + "/5" + "</b>"
 
 			if not rating:
 				raise IndexError
@@ -145,7 +145,7 @@ class album_metadata:
 
 			ratingCount = self.content.findAll("a", {"href" :"#ratings"})
 			ratingCount = ratingCount[0].findAll(text = True)
-			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
+			rating = "<b>" + rating[0] + "/5" + "</b>" + " from " + "<b>" + ratingCount[0] + " ratings" + "</b>" + "." 
 
 			if not rating:
 				raise IndexError
@@ -179,7 +179,7 @@ class album_metadata:
 			ratingCount = self.content.findAll("span", {"class" :rc})
 			ratingCount = ratingCount[0].findAll(text = True)
 
-			rating = rating[0] + "/5 from " + ratingCount[0] + " ratings."
+			rating = "<b>" + rating[0] + "/5" + "</b>" + " from " + "<b>" + ratingCount[0] + " ratings" + "</b>" + "."
 
 			if not rating:
 				raise IndexError
@@ -206,6 +206,8 @@ class album_metadata:
 			rg = re.compile("(.+)(\\s+)(stars)(,)(\\s+)(.+)(\\s+)(Ratings)")
 			
 			rating = self.content.findAll("div", {"aria-label" :rg})[0].get("aria-label")
+
+			rating = "<b>" + rating + "</b>"
 
 			if not rating:
 				raise IndexError
