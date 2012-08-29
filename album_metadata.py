@@ -31,12 +31,12 @@ class album_metadata:
 		isValidUrl = response.geturl()
 
 		while True:
-			if isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1:
+			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1):
 				break
 			else:
 				url = self.pick_url(searchString, contentSite, False)
 				response = self.open_url(url, headers)
-				firstMatchingUrl = self.fallback_search(bs(response.read()))
+				firstMatchingUrl = self.fallback_search(bs(response.read()), contentSite)
 				response = self.open_url(firstMatchingUrl, headers)
 				try:
 					isValidUrl = response.geturl()
@@ -50,9 +50,9 @@ class album_metadata:
 		self.content = bs(data)
 		return self.content
 
-	def fallback_search(self, searchResult):
+	def fallback_search(self, searchResult, contentSite):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
-		rs = re.compile("(.*)(release|album)(.*)");
+		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album)(.*)");
 		try:
 			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 		except IndexError:
