@@ -23,25 +23,29 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 	try:
 		if metadata['rating']:
 			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
+			ratingMarkedup = True
 		else:
 			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
+			ratingMarkedup = False
 
 		if not metadata['review'][0]:
 			reviewMarkup = ""
+			reviewMarkedup = False
 		else:
 			reviewMarkup = ""
 			for eachReview in metadata['review']:
 				reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
+			reviewMarkedup = True
 
-		if not ratingMarkup and not reviewMarkup:
-			markup = ""
+		if not ratingMarkedup and not reviewMarkedup:
+			markup = ratingMarkup
 		else:
 			markup = ratingMarkup + reviewMarkup
 	except:
 		markup = "Oops, content not found."
 	
-	if not markup:
-		html = "Album not found."
+	if not albumInfo.pageUrl:
+		html = markup + "<br/><i>Album not found.</i>" + hrline
 	else:
 		html = markup + hrline
 

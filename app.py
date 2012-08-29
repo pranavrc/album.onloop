@@ -28,6 +28,7 @@ def index():
 			else:
 				username = request.form['name']
 		
+		print username
 		if int(count) == 5:
 			removePickle()
 

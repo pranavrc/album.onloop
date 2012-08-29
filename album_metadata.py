@@ -5,6 +5,7 @@ import string
 from BeautifulSoup import NavigableString, BeautifulSoup as bs
 import re
 import socket
+from werkzeug import url_fix
 
 class album_metadata:
 	content = bs()
@@ -75,10 +76,10 @@ class album_metadata:
 				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + searchString + "+" + contentSite
 		return url
 
-	def open_url(self, url, headers):
+	def open_url(self, urlS, headers):
 		''' Return contents of url. '''
 		# Properly encode special characters in url.
-		url = urllib2.quote(url, safe = ":/?&+=")
+		url = url_fix(urlS)
 
 		# Make request and fetch the webpage..
 		request = urllib2.Request(url, None, headers)
