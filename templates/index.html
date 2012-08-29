@@ -14,7 +14,7 @@
 <form id="userform" action="" onsubmit="return submitForm(1, 5);">
 <fieldset>
 <input class="submitText" type="text" name="name" />
-<input class="submitBtn" type="submit" value="Submit" disabled="disabled" onclick="return submitForm(1, 5);" />
+<input class="submitBtn" type="submit" value="Submit" onclick="return submitForm(1, 5);" />
 </fieldset>
 <hr />
 </form>
@@ -52,17 +52,17 @@
 
 	$(document).ready(function(){
                 jQuery(function($){
-	        $('.submitText').Watermark("Album search (Eg.,london calling the clash)");
+	        $('.submitText').Watermark("Album search (Leave blank for random album.)");
 		});
 		
-    		$(".submitBtn").attr("disabled", "true");
+    		/*$(".submitBtn").attr("disabled", "true");
 		$(".submitText").keyup(function(){
 	        if ($(this).val() != "") {
         	    $(".submitBtn").removeAttr("disabled");
 	        } else {
 	            $(".submitBtn").attr("disabled", "true");        
 	        }
-	       });    
+	       });*/    
 	});
 	/*]]>*/
 </script>

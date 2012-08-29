@@ -2,6 +2,8 @@
 
 from flask import *
 from make_html import make_html
+from storedata import *
+from random import choice
 
 app = Flask(__name__)
 
@@ -11,8 +13,24 @@ def index():
 	if request.method == 'GET':
 		return render_template('index.html')
 	if request.method == 'POST':
-		username = request.form['name']
 		count = request.form['count']
+		if int(count) == 1:
+			username = request.form['name']
+			if username == "" or username == "Album search (Leave blank for random album.)":
+				data = readJson()
+				username = choice(data)
+				storeVar(username)
+			else:
+				pass
+		else:
+			if os.path.exists('userdata.p'):
+				username = loadVar()
+			else:
+				username = request.form['name']
+		
+		if int(count) == 5:
+			removePickle()
+
 		return make_html(username, int(count))
 
 if __name__ == "__main__":

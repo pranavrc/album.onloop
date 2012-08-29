@@ -22,7 +22,6 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 
 	try:
 		ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
-		print ratingMarkup
 		reviewMarkup = ""
 		for eachReview in metadata['review']:
 			reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
