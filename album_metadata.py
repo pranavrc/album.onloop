@@ -15,6 +15,7 @@ class album_metadata:
 	pitchforkMetadata = {}
 	sputnikmusicMetadata = {}
 	songList = []
+	pageUrl = ""
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -41,7 +42,8 @@ class album_metadata:
 					isValidUrl = response.geturl()
 				except AttributeError:
 					return ""
-
+		
+		self.pageUrl = isValidUrl
 		data = response.read()
 
 		# BeautifulSouping the webpage.
