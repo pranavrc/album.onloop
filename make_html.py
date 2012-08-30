@@ -19,6 +19,8 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 		metadata = albumInfo.discogsMetadata
 	elif contentSitename == 'itunes'.lower():
 		metadata = albumInfo.itunesMetadata
+	elif contentSitename == 'pitchfork'.lower():
+		metadata = albumInfo.pitchforkMetadata
 
 	try:
 		if metadata['rating']:
@@ -69,8 +71,11 @@ def make_html(userRequest, urlCount):
 
 	elif urlCount == 4:
 		html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse)
-
+	
 	elif urlCount == 5:
+		html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse)
+
+	elif urlCount == 6:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
 		albumInfo.allmusic_parse(htmlfoo)
 

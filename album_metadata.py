@@ -237,7 +237,30 @@ class album_metadata:
 	def pitchfork_parse(self, pitchforkSoup):
 		''' Parse the scraped Pitchfork data. '''
 
-		pass
+		try:
+			rg = re.compile("(score)(\\s+)(score)(-)(\\d+)(-)(\\d+)")
+			rating = self.content.findAll("span", {"class" :rg}, limit = 1)
+			rating = rating[0].findAll(text = True)
+
+			rating = "<b>" + rating[0].strip() + "/10" + "</b>" 
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+			
+		try:	
+			review = self.content.findAll("div", {"class" :"editorial"}, limit = 1)
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = ["", ""]
+			
+		self.pitchforkMetadata = {'rating': rating, 'review': review}
+
+		return self.pitchforkMetadata
 
 	def sputnikmusic_parse(self, sputnikmusicSoup):
 		''' Parse the scraped Sputnikmusic data. '''
@@ -247,7 +270,9 @@ class album_metadata:
 if __name__ == "__main__":
 	a = album_metadata()
 	stringo = "marquee moon"
-	b = a.search(stringo, "itunes")
+	b = a.search(stringo, "pitchfork")
+	a.pitchfork_parse(b)
+	print a.pitchforkMetadata
 	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
@@ -259,5 +284,5 @@ if __name__ == "__main__":
 	#print a.rymMetadata
 	#print
 	#print a.discogsMetadata
-	a.itunes_parse(b)
-	print a.itunesMetadata
+	#a.itunes_parse(b)
+	#print a.itunesMetadata

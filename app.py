@@ -29,7 +29,7 @@ def index():
 				username = request.form['name']
 		
 		print username
-		if int(count) == 5:
+		if int(count) == 6:
 			removePickle()
 
 		return make_html(username, int(count))
