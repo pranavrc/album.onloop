@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from album_metadata import *
 from random import choice
 from yt_fetch import *
 import string
 
-def markup(userRequest, albumInfo, contentSite, parseFunc):
+def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
 	linebreak = "<br />"
 	hrline = "<hr />"
@@ -21,10 +24,12 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 		metadata = albumInfo.itunesMetadata
 	elif contentSitename == 'pitchfork'.lower():
 		metadata = albumInfo.pitchforkMetadata
+	elif contentSitename == 'sputnikmusic'.lower():
+		metadata = albumInfo.sputnikmusicMetadata
 
 	try:
 		if metadata['rating']:
-			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode('utf-8') + linebreak
+			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + " - " + metadata['rating'].decode(encoding) + linebreak
 			ratingMarkedup = True
 		else:
 			ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
@@ -36,7 +41,8 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 		else:
 			reviewMarkup = ""
 			for eachReview in metadata['review']:
-				reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode('utf-8') + '"' + "</i>" + linebreak
+				reviewMarkup = reviewMarkup + linebreak + "<i>" + '"' + eachReview.decode(encoding) + '"' + "</i>" + linebreak
+
 			reviewMarkedup = True
 
 		if not ratingMarkedup and not reviewMarkedup:
@@ -51,6 +57,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc):
 	else:
 		html = markup + hrline
 
+	print albumInfo.songList
 	return html
 
 def make_html(userRequest, urlCount):
@@ -61,31 +68,40 @@ def make_html(userRequest, urlCount):
 	hrline = "<hr />"
 	
 	if urlCount == 1:
-		html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse)
+		html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8')
 
 	elif urlCount == 2:
-		html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse)
+		html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse, 'utf-8')
 
 	elif urlCount == 3:
-		html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse)
+		html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse, 'utf-8')
 
 	elif urlCount == 4:
-		html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse)
+		html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8')
 	
 	elif urlCount == 5:
-		html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse)
+		html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8')
 
 	elif urlCount == 6:
+		html = markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8')
+
+	elif urlCount == 7:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
 		albumInfo.allmusic_parse(htmlfoo)
+		
+		if not albumInfo.songList:
+			return "<i>Youtube Video not found.</i>"
 
-		try:
-			randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
-		except:
-			randomSongChosen = ""
+		for i in range(0, 3):
+			try:
+				randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
+				break
+			except:
+				randomSongChosen = ""
+				continue
 
 		if not randomSongChosen:
-			return "Video not found."
+			return "<i>Youtube Video not found.</i>"
 
 		youtubeEmbed = '<iframe width="420" height="345" src="http://www.youtube.com/embed/' + randomSongChosen + '"></iframe>'
 		
@@ -102,4 +118,4 @@ def make_html(userRequest, urlCount):
 	return html
 
 if __name__ == "__main__":
-	print make_html('london calling', 4)
+	print make_html('the doors the doors', 4)

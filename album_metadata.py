@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import urlparse, urllib2
+import urlparse, urllib2, urllib
 import string
 from BeautifulSoup import NavigableString, BeautifulSoup as bs
 import re
@@ -29,10 +30,13 @@ class album_metadata:
 
 		url = self.pick_url(searchString, contentSite, True)
 		response = self.open_url(url, headers)
-		isValidUrl = response.geturl()
+		try:
+			isValidUrl = response.geturl()
+		except:
+			return ""
 
 		while True:
-			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1):
+			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1 or isValidUrl.find("review") != -1):
 				break
 			else:
 				url = self.pick_url(searchString, contentSite, False)
@@ -53,7 +57,7 @@ class album_metadata:
 
 	def fallback_search(self, searchResult, contentSite):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
-		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album)(.*)");
+		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album|master|review)(.*)");
 		try:
 			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 		except IndexError:
@@ -66,14 +70,14 @@ class album_metadata:
 		if imFeelingLucky:
 			# Choosing between hyperlink search (site:foo.com) and general search.
 			if (contentSite.find(".") != -1):
-				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+site:" + contentSite
+				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+site:" + urllib.quote_plus(contentSite.encode('utf-8'))
 			else:
-				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + searchString + "+" + contentSite
+				url = "http://www.google.com/search?hl=en&safe=off&btnI&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+" + urllib.quote_plus(contentSite.encode('utf-8'))
 		else:
 			if (contentSite.find(".") != -1):
-				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + searchString + "+site:" + contentSite
+				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+site:" + urllib.quote_plus(contentSite.encode('utf-8'))
 			else:
-				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + searchString + "+" + contentSite
+				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+" + urllib.quote_plus(contentSite.encode('utf-8'))
 		return url
 
 	def open_url(self, urlS, headers):
@@ -93,7 +97,7 @@ class album_metadata:
 			return 'URL Error.'
 		except ValueError:
 			return 'Invalid URL.'
-
+		
 		return response
 
 	def strip_tags(self, html):
@@ -128,7 +132,7 @@ class album_metadata:
 		try:
 			# List of songs in the album
 			self.songList = self.content.findAll("a", {"class" :"primary_link"})
-			self.songList = [song.findAll(text = True)[0] for song in self.songList]
+			self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
 		except IndexError:
 			self.songList = []
 		
@@ -256,7 +260,7 @@ class album_metadata:
 			if not review:
 				raise IndexError
 		except IndexError:
-			review = ["", ""]
+			review = [""]
 			
 		self.pitchforkMetadata = {'rating': rating, 'review': review}
 
@@ -264,15 +268,53 @@ class album_metadata:
 
 	def sputnikmusic_parse(self, sputnikmusicSoup):
 		''' Parse the scraped Sputnikmusic data. '''
+		try:
+			rating = self.content.findAll("font", {"size" :"5", "color" :"#FF0000"})
+			rating = rating[0].findAll(text = True)
 
-		pass
+			rating = "<b>" + rating[0].strip() + "/5" + "</b>" 
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+			
+		try:	
+			review = self.content.findAll("font", {"size" :"2", "class" :"defaulttext"}, limit = 1)
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+
+			rg = re.compile("(\\d+)( of )(\\d+)( thought this review was well written)");
+			rc = re.compile("(Share:)(.*)");
+
+			review[0] = re.sub(rg, '<br />', review[0])
+			review[0] = review[0].replace("\n", "")
+			review[0] = re.sub(rc, '', review[0])#.decode('ISO-8859-1').encode('utf-8')
+
+			# Bad Hack to get around ISO-8859-1 to UTF-8 conversion issues.
+			rc = re.compile('(&)((?:[a-z][a-z]+))(;)(&)((?:[a-z][a-z]+))(;)')
+			review[0] = re.sub(rc, '', review[0])
+			rc = re.compile('(â|€)')
+			review[0] = re.sub(rc, '', review[0])
+			#review[0] = review[0].replace('€', '')
+			#review[0] = review[0].replace('â', '\'')
+
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = [""]
+			
+		self.sputnikmusicMetadata = {'rating': rating, 'review': review}
+
+		return self.sputnikmusicMetadata
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "marquee moon"
-	b = a.search(stringo, "pitchfork")
-	a.pitchfork_parse(b)
-	print a.pitchforkMetadata
+	stringo = "The Doors Live in Boston 1970"
+	b = a.search(stringo, "sputnikmusic")
+	a.sputnikmusic_parse(b)
+	print a.sputnikmusicMetadata
+	#a.pitchfork_parse(b)
+	#print a.pitchforkMetadata
 	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
