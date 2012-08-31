@@ -19,7 +19,7 @@ class album_metadata:
 	sputnikmusicMetadata = {}
 	songList = []
 	pageUrl = ""
-	albumart = "" 
+	albumart = ""
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -137,13 +137,14 @@ class album_metadata:
 			self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
 		except IndexError:
 			self.songList = []
-
-		try:
-			self.albumart = self.content.findAll("div", {"class" :"image-container"}, limit = 1)[0].get("data-large")
-			self.albumart = json.loads(self.albumart)["url"]
-			urllib.urlretrieve(str(self.albumart), "./static/albumart.jpg")
-		except:
-			self.albumart = []
+		
+		if self.songList:
+			try:
+				self.albumart = self.content.findAll("div", {"class" :"image-container"}, limit = 1)[0].get("data-large")
+				self.albumart = json.loads(self.albumart)["url"]
+				urllib.urlretrieve(str(self.albumart), "./static/albumart.jpg")
+			except:
+				self.albumart = []
 		
 		# Populate the metadata dictionary.
 		self.allmusicMetadata = {'rating': rating, 'review': review}
@@ -318,15 +319,15 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "cottonwoodhill"
-	b = a.search(stringo, "allmusic")
+	stringo = "abbey road"
+	b = a.search(stringo, "rateyourmusic")
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	a.allmusic_parse(b)
+	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
-	#print b
+	print b
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
