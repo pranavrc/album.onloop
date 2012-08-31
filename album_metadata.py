@@ -7,6 +7,7 @@ from BeautifulSoup import NavigableString, BeautifulSoup as bs
 import re
 import socket
 from werkzeug import url_fix
+import json
 
 class album_metadata:
 	content = bs()
@@ -18,6 +19,7 @@ class album_metadata:
 	sputnikmusicMetadata = {}
 	songList = []
 	pageUrl = ""
+	albumart = "" 
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -135,6 +137,13 @@ class album_metadata:
 			self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
 		except IndexError:
 			self.songList = []
+
+		try:
+			self.albumart = self.content.findAll("div", {"class" :"image-container"}, limit = 1)[0].get("data-large")
+			self.albumart = json.loads(self.albumart)["url"]
+			urllib.urlretrieve(str(self.albumart), "./static/albumart.jpg")
+		except:
+			self.albumart = []
 		
 		# Populate the metadata dictionary.
 		self.allmusicMetadata = {'rating': rating, 'review': review}
@@ -309,13 +318,13 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "The Doors Live in Boston 1970"
-	b = a.search(stringo, "sputnikmusic")
-	a.sputnikmusic_parse(b)
-	print a.sputnikmusicMetadata
+	stringo = "cottonwoodhill"
+	b = a.search(stringo, "allmusic")
+	#a.sputnikmusic_parse(b)
+	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	#a.allmusic_parse(b)
+	a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print b
 	#a.rym_parse(b)
