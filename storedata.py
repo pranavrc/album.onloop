@@ -26,15 +26,17 @@ def writeJson():
 		albums = [strip_tags(str(eachAlbum)) for eachAlbum in albums]
 		albumsList.extend(albums)
 
-	f = open("list_of_albums.json", 'w')
+	albums = {'albums' :albumsList}
 
-	jsonEncode = json.dumps(albumsList)
+	f = open("static/list_of_albums.json", 'w')
+
+	jsonEncode = json.dumps(albums)
 
 	f.write(jsonEncode)
 	f.close()
 
 def readJson():
-	f = open("list_of_albums.json").read()
+	f = open("static/list_of_albums.json").read()
 	data = json.loads(f)
 	return data
 
@@ -50,6 +52,7 @@ def removePickle():
 		os.remove('userdata.p')
 
 if __name__ == "__main__":
-	username = "foo"
-	storeVar(username)
-	print loadVar(username)
+	writeJson()
+	#username = "foo"
+	#storeVar(username)
+	#print loadVar(username)
