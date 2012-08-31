@@ -50,7 +50,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 		else:
 			markup = ratingMarkup + reviewMarkup
 	except:
-		markup = "Oops, content not found."
+		markup = "<i>Oops, content not found.</i>"
 	
 	if not albumInfo.pageUrl:
 		html = markup + "<br/><i>Album not found.</i>" + hrline
@@ -103,7 +103,7 @@ def make_html(userRequest, urlCount):
 		if not randomSongChosen:
 			return "<i>Youtube Video not found.</i>"
 
-		youtubeEmbed = '<iframe width="420" height="345" src="http://www.youtube.com/embed/' + randomSongChosen + '"></iframe>'
+		youtubeEmbed = '<iframe title="Youtube video player" width="420" height="315" src="http://www.youtube.com/embed/' + randomSongChosen + '" frameborder="0" allowfullscreen></iframe>'
 		
 		html = youtubeEmbed
 
