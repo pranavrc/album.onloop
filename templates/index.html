@@ -1,26 +1,26 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta charset="UTF-8" />
 <title>Check that album out.</title>
-<link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{url_for('static',filename='index.css')}}" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
 
 <div class="formDiv">
-<form id="userform" action="" onsubmit="return submitForm(1, 7);">
+<form id="userform" onsubmit="return submitForm(1, 7);">
 <fieldset>
 <input class="submitText" type="text" name="name" />
-<input class="submitBtn" type="submit" value="Submit" onclick="return submitForm(1, 7);" />
+<input class="submitBtn" type="submit" value="Submit" onclick="return submitForm(1, 7);"/>
 </fieldset>
 <hr />
 </form>
 </div>
 
-<div class="myDiv"><a href="http://album.onloop.net/"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="album.onloop" /></a><br />Content aggregator for Music Albums.<br /><i>Thanks to Google Search, Allmusic, RateYourMusic, Discogs, iTunes Store.</i></div>
+<div class="myDiv"><a href="http://album.onloop.net/"><img src="{{url_for('static',filename='logo.jpg')}}" alt="album.onloop"/></a><br />Content aggregator for Music Albums.<br /><i>Thanks to Google Search, Allmusic, RateYourMusic, Discogs, iTunes Store.</i></div>
 
 <hr />
 
@@ -30,8 +30,8 @@
 
 <p><br /></p>
 
-<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.7.2.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='jquery.watermarkinput.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='jquery-1.7.2.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='jquery.watermarkinput.js')}}"></script>
 <script type="text/javascript">
 	/*<![CDATA[*/
 	var formString;
