@@ -9,6 +9,8 @@ import socket
 from werkzeug import url_fix
 import json
 
+socket.setdefaulttimeout(3) 
+
 class album_metadata:
 	content = bs()
 	allmusicMetadata = {}
@@ -20,6 +22,7 @@ class album_metadata:
 	songList = []
 	pageUrl = ""
 	albumart = ""
+	searchUrl = ""
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -80,6 +83,8 @@ class album_metadata:
 				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+site:" + urllib.quote_plus(contentSite.encode('utf-8'))
 			else:
 				url = "http://www.google.com/search?hl=en&safe=off&sourceid=navclient&q=" + urllib.quote_plus(searchString.encode('utf-8')) + "+" + urllib.quote_plus(contentSite.encode('utf-8'))
+
+		self.searchUrl = url
 		return url
 
 	def open_url(self, urlS, headers):
@@ -90,15 +95,9 @@ class album_metadata:
 		# Make request and fetch the webpage..
 		request = urllib2.Request(url, None, headers)
 		try:
-			response = urllib2.urlopen(request)
-		except urllib2.HTTPError, e:
-			return 'Oops, HTTPError.'
-		except urllib2.URLError, e:
-			if isinstance(e.reason, socket.timeout):
-				return 'Timed out.'
-			return 'URL Error.'
-		except ValueError:
-			return 'Invalid URL.'
+			response = urllib2.urlopen(request, timeout = 3)
+		except:
+			return 'Oops, something went wrong.'
 		
 		return response
 
