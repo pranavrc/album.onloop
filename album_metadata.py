@@ -24,8 +24,7 @@ class album_metadata:
 	pageUrl = ""
 	albumart = ""
 	searchUrl = ""
-	rymUrlValid = False
-	albumartFile = ""
+	#albumartFile = ""
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
@@ -46,14 +45,10 @@ class album_metadata:
 		while True:
 			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1 or isValidUrl.find("review") != -1):
 				if contentSite.lower() == 'rateyourmusic':
-					if (isValidUrl.find("/buy") == -1 and isValidUrl.find("/reviews") == -1) or self.rymUrlValid:
-						break
-					else:
-						response = self.urlhelper(searchString, contentSite, headers)
-						try:
-							isValidUrl = response.geturl()
-						except AttributeError:
-							return ""
+					if (isValidUrl.find('/buy') != -1 or isValidUrl.find('/reviews') != -1 or isValidUrl.find('/ratings') != -1):
+							rc = re.compile("(\\/)(buy|reviews|ratings)", re.IGNORECASE|re.DOTALL)
+							isValidUrl = re.sub(rc, "", isValidUrl)
+							response = self.open_url(isValidUrl, headers)
 				break
 			else:
 				response = self.urlhelper(searchString, contentSite, headers)
@@ -79,29 +74,12 @@ class album_metadata:
 
 	def fallback_search(self, searchResult, contentSite):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
-		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album|master|review)(.*)");
-		i = 0
-		while True:
-			try:
-				url = searchResult.findAll("a", {"href" :rs})[i].get("href")
-				if contentSite.lower() == 'rateyourmusic':
-					if (url.find("/buy") != -1 or url.find("/reviews") != -1):
-						i += 1
-						continue
-					else:
-						break
-				break
-			except:
-				if contentSite.lower() == 'rateyourmusic':
-					if i > 0:
-						url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
-						self.rymUrlValid = True
-					else:
-						url = ""
-						self.rymUrlValid = True
-				else:
-					url = ""
-				break
+		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album|master|review)(.*)")
+		try:
+			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
+		except:
+			url = ""
+		
 		return url
 
 	def pick_url(self, searchString, contentSite, imFeelingLucky):
@@ -178,9 +156,9 @@ class album_metadata:
 				try:
 					self.albumart = self.content.findAll("img", {"width" :"250"}, limit = 1)[0].get("src")
 					#self.albumart = json.loads(self.albumart)["url"]
-					self.albumartFile = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(8))
-					self.albumartFile = "./static/" + self.albumartFile + ".jpg"
-					urllib.urlretrieve(str(self.albumart), self.albumartFile)
+					#self.albumartFile = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(8))
+					#self.albumartFile = "./static/" + self.albumartFile + ".jpg"
+					#urllib.urlretrieve(str(self.albumart), self.albumartFile)
 				except:
 					self.albumart = "" 
 
@@ -331,8 +309,8 @@ class album_metadata:
 			review = self.content.findAll("font", {"size" :"2", "class" :"defaulttext"}, limit = 1)
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
-			rg = re.compile("(\\d+)( of )(\\d+)( thought this review was well written)");
-			rc = re.compile("(Share:)(.*)");
+			rg = re.compile("(\\d+)( of )(\\d+)( thought this review was well written)")
+			rc = re.compile("(Share:)(.*)")
 
 			review[0] = re.sub(rg, '<br />', review[0])
 			review[0] = review[0].replace("\n", "")
@@ -357,23 +335,24 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "the dark knight"
-	b = a.search(stringo, "allmusic")
+	stringo = "kid a"
+	b = a.search(stringo, "rateyourmusic")
+	#print b
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	a.allmusic_parse(b)
+	#a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
-	#a.rym_parse(b)
+	a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
-	print a.allmusicMetadata
-	print a.songList
-	print a.albumartFile
+	#print a.allmusicMetadata
+	#print a.songList
+	#print a.albumartFile
 	#print
-	#print a.rymMetadata
+	print a.rymMetadata
 	#print
 	#print a.discogsMetadata
 	#a.itunes_parse(b)

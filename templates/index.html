@@ -15,18 +15,18 @@
 <form id="userform"> <!--onsubmit="return submitForm();"-->
 <fieldset>
 <input class="submitText" type="text" name="name" />
-<input class="submitBtn" type="submit" value="Submit" onclick="return jsonParse();"/>
+<input class="submitBtn" type="submit" value="Search" onclick="return jsonParse();"/>
 </fieldset>
 <hr />
 </form>
 </div>
 
-<div class="myDiv"><a href="http://album.onloop.net/"><img src="{{url_for('static',filename='logo.jpg')}}" alt="album.onloop"/></a><br />Content aggregator for Music Albums.<br /><i>Thanks to Google Search, Allmusic, RateYourMusic, Discogs, iTunes Store.</i></div>
+<div class="myDiv"><a href="http://album.onloop.net/"><img src="{{url_for('static',filename='logo.png')}}" alt="album.onloop"/></a><br />Content aggregator for Music Albums.<br /><i>Thanks to Google Search, Allmusic, RateYourMusic, Discogs, iTunes Store, Pitchfork, Sputnikmusic, Youtube and free information on the Web.</i></div>
 
 <hr />
 
 <p style="text-align:center;">
-<a href="mailto:me@onloop.net">Mail</a> | <a href="http://github.com/pranavrc/AlbumLore/" onclick="window.open(this.href);return false;">Fork</a> | <a href="" title="" onclick="window.open(this.href);return false;">What?</a>
+<a href="mailto:me@onloop.net">Mail</a> | <a href="http://onloop.net" onclick="window.open(this.href);return false;">Blog</a>
 </p>
 
 <p><br /></p>
@@ -37,15 +37,20 @@
 	/*<![CDATA[*/
 	var watermark = "Album Search (Leave blank for random album.)";
 	var requests;
-	
+
+	function htmlDecode(value){
+		return $('<div/>').html(value).text();
+	}
+
 	function jsonParse() {
 		var jsonFile = "{{url_for('static',filename='list_of_albums.json')}}";
 
 		$.getJSON(jsonFile).success(function(data) {
 				var randomIndex = Math.floor(Math.random() * data.albums.length);
 				var randomString = data.albums[randomIndex];
+				var decodedString = htmlDecode(randomString);
 				var formData;
-				formData = assignformString(randomString);
+				formData = assignformString(decodedString);
 				sendRequest(1, 7, formData);
 				});
 		return false;

@@ -64,7 +64,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	if contentSitename == 'allmusic'.lower():
 		if albumInfo.songList and albumInfo.albumart:
 			try:
-				info = make_tracklist(albumInfo.songList, albumInfo.albumartFile).decode('utf-8') + hrline
+				info = make_tracklist(albumInfo.songList, albumInfo.albumart).decode('utf-8') + hrline
 			except:
 				info = ""
 			html = info + html
