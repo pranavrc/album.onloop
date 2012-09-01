@@ -112,7 +112,7 @@ def make_html(userRequest, urlCount):
 
 	elif urlCount == 7:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
-		albumInfo.allmusic_parse(htmlfoo)
+		albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False)
 
 		if not albumInfo.songList:
 			return "<i>Youtube Video not found.</i>"

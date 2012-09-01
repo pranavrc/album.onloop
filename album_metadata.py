@@ -141,7 +141,7 @@ class album_metadata:
 		html = re.sub('<[^<]+?>', '', html)
 		return html
 
-	def allmusic_parse(self, allmusicSoup):
+	def allmusic_parse(self, allmusicSoup, getSongList = True, getAlbumArt = True):
 		''' Parse the scraped Allmusic data. '''
 
 		try:
@@ -164,23 +164,25 @@ class album_metadata:
 				raise IndexError
 		except IndexError:
 			review = [""]
-
-		try:
-			# List of songs in the album
-			self.songList = self.content.findAll("a", {"class" :"primary_link"})
-			self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
-		except IndexError:
-			self.songList = []
-
-		if self.songList:
+		
+		if getSongList:
 			try:
-				self.albumart = self.content.findAll("img", {"width" :"250"}, limit = 1)[0].get("src")
-				#self.albumart = json.loads(self.albumart)["url"]
-				self.albumartFile = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(8))
-				self.albumartFile = "./static/" + self.albumartFile + ".jpg"
-				urllib.urlretrieve(str(self.albumart), self.albumartFile)
-			except:
-				self.albumart = "" 
+				# List of songs in the album
+				self.songList = self.content.findAll("a", {"class" :"primary_link"})
+				self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
+			except IndexError:
+				self.songList = []
+			
+		if getAlbumArt:
+			if self.songList:
+				try:
+					self.albumart = self.content.findAll("img", {"width" :"250"}, limit = 1)[0].get("src")
+					#self.albumart = json.loads(self.albumart)["url"]
+					self.albumartFile = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(8))
+					self.albumartFile = "./static/" + self.albumartFile + ".jpg"
+					urllib.urlretrieve(str(self.albumart), self.albumartFile)
+				except:
+					self.albumart = "" 
 
 		# Populate the metadata dictionary.
 		self.allmusicMetadata = {'rating': rating, 'review': review}
