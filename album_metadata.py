@@ -29,7 +29,7 @@ class album_metadata:
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
-		searchString = searchString.replace(" ", "+")
+		searchString = searchString.replace(" ", "+").replace("(", " ").replace(")", " ")
 
 		user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
 		headers = {'User-Agent':user_agent,}
@@ -95,6 +95,7 @@ class album_metadata:
 						url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 						self.rymUrlValid = True
 					else:
+						url = ""
 						self.rymUrlValid = True
 				else:
 					url = ""
