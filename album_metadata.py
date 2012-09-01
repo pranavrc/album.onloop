@@ -29,7 +29,7 @@ class album_metadata:
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
-		searchString = searchString.replace(" ", "+").replace("(", " ").replace(")", " ")
+		searchString = searchString.replace(" ", "+").replace("(", " ").replace(")", " ").replace("-", " ")
 
 		user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
 		headers = {'User-Agent':user_agent,}
@@ -176,7 +176,7 @@ class album_metadata:
 				self.albumart = json.loads(self.albumart)["url"]
 				urllib.urlretrieve(str(self.albumart), "./static/albumart.jpg")
 			except:
-				self.albumart = []
+				self.albumart = "" 
 
 		# Populate the metadata dictionary.
 		self.allmusicMetadata = {'rating': rating, 'review': review}
@@ -351,19 +351,21 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "abbey road"
-	b = a.search(stringo, "rateyourmusic")
+	stringo = "The Legendary Pink Dots The Crushed Velvet Apocalypse"
+	b = a.search(stringo, "allmusic")
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	#a.allmusic_parse(b)
+	a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
-	print b
+	#print b
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
-	#print a.allmusicMetadata
+	print a.allmusicMetadata
+	print a.songList
+	print a.albumart
 	#print
 	#print a.rymMetadata
 	#print

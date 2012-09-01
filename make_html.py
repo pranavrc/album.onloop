@@ -37,6 +37,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 				ratingMarkedup = False
 			else:
 				ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
+				ratingMarkedup = True 
 
 		if not metadata['review'][0]:
 			reviewMarkup = ""
@@ -60,7 +61,28 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	else:
 		html = markup + hrline
 
-	print albumInfo.songList
+	if contentSitename == 'allmusic'.lower():
+		if albumInfo.songList and albumInfo.albumart:
+			try:
+				info = make_tracklist(albumInfo.songList).decode('utf-8') + hrline
+			except:
+				info = ""
+			html = info + html
+
+	return html
+
+def make_tracklist(songList):
+	tracklisting = "<b><i>Track Listing:</b></i><br/>"
+	
+	for eachSong in songList:
+		if eachSong != songList[-1]:
+			tracklisting = tracklisting + "<i>" + eachSong + "</i>" + " - "
+		else:
+			tracklisting = tracklisting + "<i>" + eachSong + "</i>"
+
+	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"./static/albumart.jpg\" alt=\"Album Art\" /><br />"
+	
+	html = albumpic + tracklisting
 	return html
 
 def make_html(userRequest, urlCount):
