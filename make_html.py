@@ -10,7 +10,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
 	linebreak = "<br />"
 	hrline = "<hr />"
-	
+
 	htmlfoo = albumInfo.search(userRequest, contentSite)
 	parseFunc(htmlfoo)
 	contentSitename = contentSite.lower()
@@ -37,7 +37,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 				ratingMarkedup = False
 			else:
 				ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
-				ratingMarkedup = True 
+				ratingMarkedup = True
 
 		if not metadata['review'][0]:
 			reviewMarkup = ""
@@ -55,7 +55,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 			markup = ratingMarkup + reviewMarkup
 	except:
 		markup = "<i>Oops, content not found.</i>"
-	
+
 	if not albumInfo.pageUrl:
 		html = markup + "<br/><i>Album not found.</i>" + hrline
 	else:
@@ -64,24 +64,24 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	if contentSitename == 'allmusic'.lower():
 		if albumInfo.songList and albumInfo.albumart:
 			try:
-				info = make_tracklist(albumInfo.songList).decode('utf-8') + hrline
+				info = make_tracklist(albumInfo.songList, albumInfo.albumartFile).decode('utf-8') + hrline
 			except:
 				info = ""
 			html = info + html
 
 	return html
 
-def make_tracklist(songList):
+def make_tracklist(songList, imageFile):
 	tracklisting = "<b><i>Track Listing:</b></i><br/>"
-	
+
 	for eachSong in songList:
 		if eachSong != songList[-1]:
 			tracklisting = tracklisting + "<i>" + eachSong + "</i>" + " - "
 		else:
 			tracklisting = tracklisting + "<i>" + eachSong + "</i>"
 
-	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"./static/albumart.jpg\" alt=\"Album Art\" /><br />"
-	
+	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
+
 	html = albumpic + tracklisting
 	return html
 
@@ -91,7 +91,7 @@ def make_html(userRequest, urlCount):
 	loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
 	linebreak = "<br />"
 	hrline = "<hr />"
-	
+
 	if urlCount == 1:
 		html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8')
 
@@ -103,7 +103,7 @@ def make_html(userRequest, urlCount):
 
 	elif urlCount == 4:
 		html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8')
-	
+
 	elif urlCount == 5:
 		html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8')
 
@@ -113,7 +113,7 @@ def make_html(userRequest, urlCount):
 	elif urlCount == 7:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
 		albumInfo.allmusic_parse(htmlfoo)
-		
+
 		if not albumInfo.songList:
 			return "<i>Youtube Video not found.</i>"
 
@@ -129,7 +129,7 @@ def make_html(userRequest, urlCount):
 			return "<i>Youtube Video not found.</i>"
 
 		youtubeEmbed = '<iframe title="Youtube video player" width="420" height="315" src="http://www.youtube.com/embed/' + randomSongChosen + '" frameborder="0" allowfullscreen></iframe>'
-		
+
 		html = youtubeEmbed
 
 	#print albumInfo.allmusicMetadata

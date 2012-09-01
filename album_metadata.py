@@ -8,8 +8,9 @@ import re
 import socket
 from werkzeug import url_fix
 import json
+from random import choice
 
-socket.setdefaulttimeout(3)
+socket.setdefaulttimeout(5)
 
 class album_metadata:
 	content = bs()
@@ -24,12 +25,13 @@ class album_metadata:
 	albumart = ""
 	searchUrl = ""
 	rymUrlValid = False
+	albumartFile = ""
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
-		searchString = searchString.replace(" ", "+").replace("(", " ").replace(")", " ").replace("-", " ")
+		searchString = searchString.replace("(", " ").replace(")", " ").replace("-", " ")
 
 		user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
 		headers = {'User-Agent':user_agent,}
@@ -44,7 +46,7 @@ class album_metadata:
 		while True:
 			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1 or isValidUrl.find("review") != -1):
 				if contentSite.lower() == 'rateyourmusic':
-					if isValidUrl.find("buy") == -1 or self.rymUrlValid:
+					if (isValidUrl.find("/buy") == -1 and isValidUrl.find("/reviews") == -1) or self.rymUrlValid:
 						break
 					else:
 						response = self.urlhelper(searchString, contentSite, headers)
@@ -83,7 +85,7 @@ class album_metadata:
 			try:
 				url = searchResult.findAll("a", {"href" :rs})[i].get("href")
 				if contentSite.lower() == 'rateyourmusic':
-					if url.find('buy') != -1:
+					if (url.find("/buy") != -1 or url.find("/reviews") != -1):
 						i += 1
 						continue
 					else:
@@ -128,7 +130,7 @@ class album_metadata:
 		# Make request and fetch the webpage..
 		request = urllib2.Request(url, None, headers)
 		try:
-			response = urllib2.urlopen(request, timeout = 3)
+			response = urllib2.urlopen(request, timeout = 5)
 		except:
 			return 'Oops, something went wrong.'
 
@@ -172,9 +174,11 @@ class album_metadata:
 
 		if self.songList:
 			try:
-				self.albumart = self.content.findAll("div", {"class" :"image-container"}, limit = 1)[0].get("data-large")
-				self.albumart = json.loads(self.albumart)["url"]
-				urllib.urlretrieve(str(self.albumart), "./static/albumart.jpg")
+				self.albumart = self.content.findAll("img", {"width" :"250"}, limit = 1)[0].get("src")
+				#self.albumart = json.loads(self.albumart)["url"]
+				self.albumartFile = ''.join(choice(string.ascii_uppercase + string.digits) for x in range(8))
+				self.albumartFile = "./static/" + self.albumartFile + ".jpg"
+				urllib.urlretrieve(str(self.albumart), self.albumartFile)
 			except:
 				self.albumart = "" 
 
@@ -351,7 +355,7 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "The Legendary Pink Dots The Crushed Velvet Apocalypse"
+	stringo = "the dark knight"
 	b = a.search(stringo, "allmusic")
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
@@ -359,13 +363,13 @@ if __name__ == "__main__":
 	#print a.pitchforkMetadata
 	a.allmusic_parse(b)
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
-	#print b
+	#print a.pageUrl
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
 	print a.allmusicMetadata
 	print a.songList
-	print a.albumart
+	print a.albumartFile
 	#print
 	#print a.rymMetadata
 	#print
