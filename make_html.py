@@ -33,7 +33,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 			ratingMarkedup = True
 		else:
 			if not albumInfo.pageUrl:
-				ratingMarkup = "<a href=\"" + albumInfo.searchUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
+				ratingMarkup = "<a href=\"" + albumInfo.searchUrl.strip("&btnI") + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
 			else:
 				ratingMarkup = "<a href=\"" + albumInfo.pageUrl + '" target="_blank">' + "<b>" + contentSite.title() + "</b>" + "</a>" + linebreak
 
