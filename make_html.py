@@ -82,8 +82,8 @@ def make_tracklist(songList, imageFile, genre):
 			tracklisting = tracklisting + "<i>" + eachSong + "</i>"
 
 	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
-
-	html = albumpic + albumGenre + tracklisting
+	
+	html = str(albumpic) + str(albumGenre) + str(tracklisting)
 	return html
 
 def make_html(userRequest, urlCount):
@@ -144,4 +144,4 @@ def make_html(userRequest, urlCount):
 	return html
 
 if __name__ == "__main__":
-	print make_html('the doors the doors', 4)
+	make_html('the dark knight', 1)

@@ -149,6 +149,14 @@ class album_metadata:
 				# List of songs in the album
 				self.songList = self.content.findAll("a", {"class" :"primary_link"})
 				self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
+
+				if not self.songList:
+					try:
+						self.songList = self.content.findAll("div", {"class" :"title primary_link"})
+						self.songList = [self.strip_tags(str(song)).strip() for song in self.songList]
+					except:
+						self.songList = []
+
 			except IndexError:
 				self.songList = []
 
@@ -342,23 +350,23 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "Weezer Weezer [Blue Album]"
+	stringo = "The Dark Knight"
 	b = a.search(stringo, "allmusic")
-	print b
+	#print b
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	#a.allmusic_parse(b)
-	#print a.genre
+	a.allmusic_parse(b)
+	print a.genre
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
-	#print a.allmusicMetadata
-	#print a.songList
-	#print a.albumartFile
+	print a.allmusicMetadata
+	print a.songList
+	print a.albumart
 	#print
 	#print a.rymMetadata
 	#print a.pageUrl
