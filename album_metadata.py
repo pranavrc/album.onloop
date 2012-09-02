@@ -21,6 +21,7 @@ class album_metadata:
 	pitchforkMetadata = {}
 	sputnikmusicMetadata = {}
 	rsMetadata = {}
+	metacriticMetadata = {}
 	songList = []
 	genre = []
 	styles = ""
@@ -47,9 +48,8 @@ class album_metadata:
 			isValidUrl = response.geturl()
 		except:
 			return ""
-
 		for results in range(0, 10):
-			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("/release") != -1 or isValidUrl.find("/album") != -1 or isValidUrl.find("/master") != -1 or isValidUrl.find("/review") != -1 or isValidUrl.find("/albumreviews") != -1):
+			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("/release") != -1 or isValidUrl.find("/album") != -1 or isValidUrl.find("/master") != -1 or isValidUrl.find("/review") != -1 or isValidUrl.find("/albumreviews") != -1 or isValidUrl.find("metacritic.com/music/") != -1):
 				if contentSite.lower() == 'rateyourmusic':
 					if (isValidUrl.find('/buy') != -1 or isValidUrl.find('/reviews') != -1 or isValidUrl.find('/ratings') != -1):
 							rc = re.compile("(\\/)(buy|reviews|ratings)", re.IGNORECASE|re.DOTALL)
@@ -80,7 +80,7 @@ class album_metadata:
 
 	def fallback_search(self, searchResult, contentSite):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
-		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(\\/release|\\/album|\\/master|\\/review|\\/albumreviews)(.*)")
+		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(\\/release|\\/album|\\/master|\\/review|\\/albumreviews|(metacritic)(\\.)(com)(\\/music\\/))(.*)")
 		try:
 			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 		except:
@@ -391,19 +391,47 @@ class album_metadata:
 
 		return self.rsMetadata
 
+	def metacritic_parse(self, metacriticSoup):
+		''' Parse the scraped metacritic data. '''
+		try:
+			rating = self.content.findAll("span", {"property" :"v:average"}, limit = 1)
+			rating = rating[0].findAll(text = True)
+			
+			rating = "<b>" + rating[0].strip() + "/100" + "</b>"
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+
+		try:
+			review = self.content.findAll("span", {"class" :"inline_expand_collapse inline_collapsed"}, limit = 1)
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+			review[0] = review[0].replace("&hellip; Expand", "")
+
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = [""]
+
+		self.metacriticMetadata = {'rating': rating, 'review': review}
+
+		return self.metacriticMetadata
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "london calling"
+	stringo = "kid a"
 	b = a.search(stringo, "rollingstone")
+	#a.metacritic_parse(b)
+	#print a.metacriticMetadata
 	#print b
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
 	#a.allmusic_parse(b)
-	a.rs_parse(b)
-	print a.rsMetadata
+	#a.rs_parse(b)
+	#print a.rsMetadata
 	#print a.styles
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
