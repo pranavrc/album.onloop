@@ -1,4 +1,6 @@
-AlbumLore
-=========
+album.onloop
+============
 
-Check that new album out
+Check that new album out.
+
+Pranav Ravichandran <me@onloop.net>
