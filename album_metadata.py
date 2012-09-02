@@ -297,7 +297,7 @@ class album_metadata:
 		''' Parse the scraped Pitchfork data. '''
 
 		try:
-			rg = re.compile("(score)(\\s+)(score)(-)(\\d+)(-)(\\d+)")
+			rg = re.compile("(score)(.*)(score)(-)(\\d+)(-)(\\d+)")
 			rating = self.content.findAll("span", {"class" :rg}, limit = 1)
 			rating = rating[0].findAll(text = True)
 
