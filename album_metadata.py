@@ -21,7 +21,8 @@ class album_metadata:
 	pitchforkMetadata = {}
 	sputnikmusicMetadata = {}
 	songList = []
-	genre = [] 
+	genre = []
+	styles = ""
 	pageUrl = ""
 	albumart = ""
 	searchUrl = ""
@@ -43,7 +44,7 @@ class album_metadata:
 		except:
 			return ""
 
-		while True:
+		for results in range(0, 10):
 			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1 or isValidUrl.find("review") != -1):
 				if contentSite.lower() == 'rateyourmusic':
 					if (isValidUrl.find('/buy') != -1 or isValidUrl.find('/reviews') != -1 or isValidUrl.find('/ratings') != -1):
@@ -80,7 +81,6 @@ class album_metadata:
 			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 		except:
 			url = ""
-		
 		return url
 
 	def pick_url(self, searchString, contentSite, imFeelingLucky):
@@ -120,7 +120,7 @@ class album_metadata:
 		html = re.sub('<[^<]+?>', '', html)
 		return html
 
-	def allmusic_parse(self, allmusicSoup, getSongList = True, getAlbumArt = True):
+	def allmusic_parse(self, allmusicSoup, getSongList = True, getAlbumArt = True, getGenre = True, getStyles = True):
 		''' Parse the scraped Allmusic data. '''
 
 		try:
@@ -160,11 +160,21 @@ class album_metadata:
 			except IndexError:
 				self.songList = []
 
+		if getGenre:
 			if self.songList:
 				try:
 					self.genre = self.content.findAll("dd", {"class" :"genres"}, limit = 1)[0].findAll(text = True)[2]
 				except:
 					self.genre = ""
+
+		if getStyles:
+			if self.genre:
+				try:
+					self.styles = self.content.findAll("dd", {"class" :"styles"})
+					self.styles = [self.strip_tags(str(style)).strip() for style in self.styles]
+					self.styles = self.styles[0].replace("\n", " / ")
+				except:
+					self.styles = ""
 			
 		if getAlbumArt:
 			if self.songList:
@@ -358,7 +368,7 @@ if __name__ == "__main__":
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
 	a.allmusic_parse(b)
-	print a.genre
+	print a.styles
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
 	#a.rym_parse(b)

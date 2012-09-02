@@ -62,26 +62,42 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 		html = markup + hrline
 
 	if contentSitename == 'allmusic'.lower():
-		if albumInfo.songList and albumInfo.albumart:
-			try:
-				info = make_tracklist(albumInfo.songList, albumInfo.albumart, albumInfo.genre).decode('utf-8') + hrline
-			except:
-				info = ""
+		try:
+			info = make_tracklist(albumInfo.songList, albumInfo.albumart, albumInfo.genre, albumInfo.styles).decode('utf-8')
+		except:
+			info = ""
+
+		if info:
+			html = info + hrline + html
+		else:
 			html = info + html
 
 	return html
 
-def make_tracklist(songList, imageFile, genre):
-	albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br/>"
+def make_tracklist(songList, imageFile, genre, styles):
 	tracklisting = "<b><i>Track Listing:</b></i><br/>"
 
-	for eachSong in songList:
-		if eachSong != songList[-1]:
-			tracklisting = tracklisting + "<i>" + eachSong + "</i>" + " - "
+	if genre:
+		if styles:
+			albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + " (" + styles + ")</i><br/>"
 		else:
-			tracklisting = tracklisting + "<i>" + eachSong + "</i>"
+			albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br/>"
+	else:
+		albumGenre = ""
 
-	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
+	if songList:
+		for eachSong in songList:
+			if eachSong != songList[-1]:
+				tracklisting = tracklisting + "<i>" + eachSong + "</i>" + " - "
+			else:
+				tracklisting = tracklisting + "<i>" + eachSong + "</i>"
+	else:
+		tracklisting = ""
+
+	if imageFile:
+		albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
+	else:
+		albumpic = ""
 	
 	html = str(albumpic) + str(albumGenre) + str(tracklisting)
 	return html
@@ -113,7 +129,7 @@ def make_html(userRequest, urlCount):
 
 	elif urlCount == 7:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
-		albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False)
+		albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False, getGenre = False, getStyles = False)
 
 		if not albumInfo.songList:
 			try:
@@ -147,4 +163,4 @@ def make_html(userRequest, urlCount):
 	return html
 
 if __name__ == "__main__":
-	make_html('the dark knight', 1)
+	make_html('live', 4)
