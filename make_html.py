@@ -26,6 +26,8 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 		metadata = albumInfo.pitchforkMetadata
 	elif contentSitename == 'sputnikmusic'.lower():
 		metadata = albumInfo.sputnikmusicMetadata
+	elif contentSitename == 'rollingstone'.lower():
+		metadata = albumInfo.rsMetadata
 
 	try:
 		if metadata['rating']:
@@ -128,6 +130,9 @@ def make_html(userRequest, urlCount):
 		html = markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8')
 
 	elif urlCount == 7:
+		html = markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8')
+
+	elif urlCount == 8:
 		htmlfoo = albumInfo.search(userRequest, 'allmusic')
 		albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False, getGenre = False, getStyles = False)
 

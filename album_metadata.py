@@ -20,6 +20,7 @@ class album_metadata:
 	itunesMetadata = {}
 	pitchforkMetadata = {}
 	sputnikmusicMetadata = {}
+	rsMetadata = {}
 	songList = []
 	genre = []
 	styles = ""
@@ -30,6 +31,9 @@ class album_metadata:
 
 	def search(self, searchString, contentSite):
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
+
+		if contentSite.lower() == "rollingstone":
+			searchString = str(searchString) + " album review"
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
 		searchString = searchString.replace("(", " ").replace(")", " ").replace("-", " ").replace("[", "").replace("]", "")
@@ -45,7 +49,7 @@ class album_metadata:
 			return ""
 
 		for results in range(0, 10):
-			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("release") != -1 or isValidUrl.find("album") != -1 or isValidUrl.find("master") != -1 or isValidUrl.find("review") != -1):
+			if (isValidUrl.find(contentSite.lower()) != -1) and (isValidUrl.find("/release") != -1 or isValidUrl.find("/album") != -1 or isValidUrl.find("/master") != -1 or isValidUrl.find("/review") != -1 or isValidUrl.find("/albumreviews") != -1):
 				if contentSite.lower() == 'rateyourmusic':
 					if (isValidUrl.find('/buy') != -1 or isValidUrl.find('/reviews') != -1 or isValidUrl.find('/ratings') != -1):
 							rc = re.compile("(\\/)(buy|reviews|ratings)", re.IGNORECASE|re.DOTALL)
@@ -76,7 +80,7 @@ class album_metadata:
 
 	def fallback_search(self, searchResult, contentSite):
 		''' For cases where the I'm Feeling Lucky search fails. (like The Doors by The Doors) '''
-		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(release|album|master|review)(.*)")
+		rs = re.compile("(.*)(" + contentSite.lower() + ")(.*)(\\/release|\\/album|\\/master|\\/review|\\/albumreviews)(.*)")
 		try:
 			url = searchResult.findAll("a", {"href" :rs}, limit = 1)[0].get("href")
 		except:
@@ -358,25 +362,57 @@ class album_metadata:
 
 		return self.sputnikmusicMetadata
 
+	def rs_parse(self, rsSoup):
+		''' Parse the scraped Rolling Stone data. '''
+		try:
+			rating = self.content.findAll("span", {"itemprop" :"ratingValue"}, limit = 1)
+			rating = rating[0].findAll(text = True)
+			
+			if rating[0] == '0':
+				rating = "<i>Not rated</i>"
+			else:
+				rating = "<b>" + rating[0].strip() + "/5" + "</b>"
+
+			if not rating:
+				raise IndexError
+		except IndexError:
+			rating = ""
+
+		try:
+			review = self.content.findAll("div", {"itemprop" :"reviewBody"}, limit = 1)
+			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
+
+			if not review:
+				raise IndexError
+		except IndexError:
+			review = [""]
+
+		self.rsMetadata = {'rating': rating, 'review': review}
+
+		return self.rsMetadata
+
+
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "The Dark Knight"
-	b = a.search(stringo, "allmusic")
+	stringo = "london calling"
+	b = a.search(stringo, "rollingstone")
 	#print b
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
-	a.allmusic_parse(b)
-	print a.styles
+	#a.allmusic_parse(b)
+	a.rs_parse(b)
+	print a.rsMetadata
+	#print a.styles
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
 	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
-	print a.allmusicMetadata
-	print a.songList
-	print a.albumart
+	#print a.allmusicMetadata
+	#print a.songList
+	#print a.albumart
 	#print
 	#print a.rymMetadata
 	#print a.pageUrl
