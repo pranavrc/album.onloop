@@ -21,6 +21,7 @@ class album_metadata:
 	pitchforkMetadata = {}
 	sputnikmusicMetadata = {}
 	songList = []
+	genre = [] 
 	pageUrl = ""
 	albumart = ""
 	searchUrl = ""
@@ -30,7 +31,7 @@ class album_metadata:
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
-		searchString = searchString.replace("(", " ").replace(")", " ").replace("-", " ")
+		searchString = searchString.replace("(", " ").replace(")", " ").replace("-", " ").replace("[", "").replace("]", "")
 
 		user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
 		headers = {'User-Agent':user_agent,}
@@ -150,6 +151,12 @@ class album_metadata:
 				self.songList = [song.findAll(text = True)[0].encode('utf-8') for song in self.songList]
 			except IndexError:
 				self.songList = []
+
+			if self.songList:
+				try:
+					self.genre = self.content.findAll("dd", {"class" :"genres"}, limit = 1)[0].findAll(text = True)[2]
+				except:
+					self.genre = ""
 			
 		if getAlbumArt:
 			if self.songList:
@@ -335,24 +342,26 @@ class album_metadata:
 
 if __name__ == "__main__":
 	a = album_metadata()
-	stringo = "kid a"
-	b = a.search(stringo, "rateyourmusic")
-	#print b
+	stringo = "Weezer Weezer [Blue Album]"
+	b = a.search(stringo, "allmusic")
+	print b
 	#a.sputnikmusic_parse(b)
 	#print a.sputnikmusicMetadata
 	#a.pitchfork_parse(b)
 	#print a.pitchforkMetadata
 	#a.allmusic_parse(b)
+	#print a.genre
 	#b = a.search('abbey road the beatles', 'rateyourmusic')
 	#print a.pageUrl
-	a.rym_parse(b)
+	#a.rym_parse(b)
 	#b = a.search('abbey road the beatles', 'discogs')
 	#a.discogs_parse(b)
 	#print a.allmusicMetadata
 	#print a.songList
 	#print a.albumartFile
 	#print
-	print a.rymMetadata
+	#print a.rymMetadata
+	#print a.pageUrl
 	#print
 	#print a.discogsMetadata
 	#a.itunes_parse(b)

@@ -64,14 +64,15 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
 	if contentSitename == 'allmusic'.lower():
 		if albumInfo.songList and albumInfo.albumart:
 			try:
-				info = make_tracklist(albumInfo.songList, albumInfo.albumart).decode('utf-8') + hrline
+				info = make_tracklist(albumInfo.songList, albumInfo.albumart, albumInfo.genre).decode('utf-8') + hrline
 			except:
 				info = ""
 			html = info + html
 
 	return html
 
-def make_tracklist(songList, imageFile):
+def make_tracklist(songList, imageFile, genre):
+	albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br/>"
 	tracklisting = "<b><i>Track Listing:</b></i><br/>"
 
 	for eachSong in songList:
@@ -82,7 +83,7 @@ def make_tracklist(songList, imageFile):
 
 	albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
 
-	html = albumpic + tracklisting
+	html = albumpic + albumGenre + tracklisting
 	return html
 
 def make_html(userRequest, urlCount):

@@ -46,7 +46,7 @@
 		var jsonFile = "{{url_for('static',filename='list_of_albums.json')}}";
 
 		$.getJSON(jsonFile).success(function(data) {
-				var randomIndex = Math.floor(Math.random() * data.albums.length);
+				var randomIndex = Math.floor(Math.random() * data.albums.length/5);
 				var randomString = data.albums[randomIndex];
 				var decodedString = htmlDecode(randomString);
 				var formData;
