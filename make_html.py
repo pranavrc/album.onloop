@@ -116,15 +116,18 @@ def make_html(userRequest, urlCount):
 		albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False)
 
 		if not albumInfo.songList:
-			return "<i>Youtube Video not found.</i>"
-
-		for i in range(0, 3):
 			try:
-				randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
-				break
+				randomSongChosen = ytMetadata().SearchAndPrint(userRequest)
 			except:
 				randomSongChosen = ""
-				continue
+		else:
+			for i in range(0, 3):
+				try:
+					randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
+					break
+				except:
+					randomSongChosen = ""
+					continue
 
 		if not randomSongChosen:
 			return "<i>Youtube Video not found.</i>"
