@@ -143,13 +143,13 @@ def make_html(userRequest, urlCount):
 
 		if not albumInfo.songList:
 			try:
-				randomSongChosen = ytMetadata().SearchAndPrint(userRequest)
+				randomSongChosen = ytMetadata().SearchAndPrint(userRequest.encode('utf-8'))
 			except:
 				randomSongChosen = ""
 		else:
 			for i in range(0, 3):
 				try:
-					randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest)
+					randomSongChosen = ytMetadata().SearchAndPrint(choice(albumInfo.songList) + " " + userRequest.encode('utf-8'))
 					break
 				except:
 					randomSongChosen = ""
