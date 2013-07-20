@@ -14,7 +14,7 @@ def index():
 		return render_template('index.html')
 	if request.method == 'POST':
 		count = request.form['count']
-		username = request.form['name']
+		query = request.form['query']
 		#if int(count) == 1:
 		#	username = request.form['name']
 		#	if username == "" or username == "Album search (Leave blank for random album.)":
@@ -33,7 +33,7 @@ def index():
 		#if int(count) == 7:
 		#	removePickle()
 
-		return make_html(username, int(count))
+		return make_html(query, int(count))
 
 if __name__ == "__main__":
 	app.run(debug = True)
