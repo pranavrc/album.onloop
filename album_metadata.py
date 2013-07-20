@@ -34,7 +34,7 @@ class album_metadata:
 		''' Google I'm Feeling Lucky Search for searchString in contentSite. '''
 
 		if contentSite.lower() == "rollingstone":
-			searchString = str(searchString) + " album review"
+			searchString = searchString + " album review"
 
 		## Url spoofing to get past Google's bot-blocking mechanism.
 		searchString = searchString.replace("(", " ").replace(")", " ").replace("-", " ").replace("[", "").replace("]", "")
