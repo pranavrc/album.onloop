@@ -247,7 +247,7 @@ class album_metadata:
 			rating = ""
 
 		try:
-			review = self.content.findAll("div", {"class": "squish_lines_8 comment group"})
+			review = self.content.findAll("div", {"class": "review_comment"})
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
 			if not review:
@@ -324,7 +324,7 @@ class album_metadata:
 	def sputnikmusic_parse(self, sputnikmusicSoup):
 		''' Parse the scraped Sputnikmusic data. '''
 		try:
-			rating = self.content.findAll("font", {"size" :"5", "color" :"#FF0000"})
+			rating = self.content.findAll("font", {"size" :"4", "color" :"#888888"})
 			rating = rating[0].findAll(text = True)
 
 			rating = "<b>" + rating[0].strip() + "/5" + "</b>"
@@ -335,7 +335,7 @@ class album_metadata:
 			rating = ""
 
 		try:
-			review = self.content.findAll("font", {"size" :"2", "class" :"defaulttext"}, limit = 1)
+			review = self.content.findAll("div", {"id" :"leftColumn"}, limit = 1)
 			review = [self.strip_tags(str(eachReview)).strip() for eachReview in review]
 
 			rg = re.compile("(\\d+)( of )(\\d+)( thought this review was well written)")
