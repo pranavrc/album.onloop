@@ -152,7 +152,7 @@ class album_metadata:
             try:
                 # List of songs in the album
                 self.songList = self.content.findAll("div", {"class" :"title"})
-                self.songList = [song.findAll(text = True)[1].encode('utf-8') for song in self.songList]
+                self.songList = [song.findAll(text = True)[2].encode('utf-8') for song in self.songList]
 
             except IndexError:
                 self.songList = []
@@ -195,12 +195,12 @@ class album_metadata:
         ''' Parse the scraped RateYourMusic data. '''
 
         try:
-            rating = self.content.findAll("span", {"style" :"font-size:1.3em;font-weight:bold;"})
+            rating = self.content.findAll("span", {"class" :"rating", "style" :"display:none;"})
             rating = rating[0].findAll(text = True)
 
             ratingCount = self.content.findAll("a", {"href" :"#ratings"})
             ratingCount = ratingCount[0].findAll(text = True)
-            rating = "<b>" + rating[0] + "/5" + "</b>" + " from " + "<b>" + ratingCount[0] + " ratings" + "</b>" + "."
+            rating = "<b>" + rating[0].strip('" ') + "/5" + "</b>" + " from " + "<b>" + ratingCount[0] + " ratings" + "</b>" + "."
 
             if not rating:
                 raise IndexError
