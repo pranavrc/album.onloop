@@ -73,7 +73,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
             info = ""
 
         if info:
-            html = info + hrline + html
+            html = "<div class=\"info\">" + info + "</div>" + hrline + html
         else:
             html = info + html
 
@@ -84,9 +84,9 @@ def make_tracklist(songList, imageFile, genre, styles):
 
     if genre:
         if styles:
-            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + " (" + styles + ")</i><br />"
+            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + " (" + styles + ")</i><br /><br />"
         else:
-            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br />"
+            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br /><br />"
     else:
         albumGenre = ""
 
@@ -100,7 +100,8 @@ def make_tracklist(songList, imageFile, genre, styles):
         tracklisting = ""
 
     if imageFile:
-        albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
+        albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + \
+                "\" alt=\"Album Art\" /><br /><br />"
     else:
         albumpic = ""
 
