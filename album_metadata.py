@@ -152,7 +152,12 @@ class album_metadata:
             try:
                 # List of songs in the album
                 self.songList = self.content.findAll("div", {"class" :"title"})
-                self.songList = [song.findAll(text = True)[2].encode('utf-8') for song in self.songList]
+                tempList = []
+
+                for song in self.songList:
+                    tempList += song.findAll(text = True)
+
+                self.songList = [a.encode('utf-8') for a in tempList if a != '\n']
 
             except IndexError:
                 self.songList = []
