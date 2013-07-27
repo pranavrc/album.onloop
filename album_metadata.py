@@ -349,7 +349,7 @@ class album_metadata:
             rc = re.compile('(&)((?:[a-z][a-z]+))(;)(&)((?:[a-z][a-z]+))(;)')
             review[0] = re.sub(rc, '', review[0])
             rc = re.compile('(â|€)')
-            review[0] = re.sub(rc, '', review[0])
+            review[0] = re.sub(rc, '', review[0]).split("(function(")[0]
             #review[0] = review[0].replace('€', '')
             #review[0] = review[0].replace('â', '\'')
 
