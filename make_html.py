@@ -62,9 +62,9 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
         markup = "<i>Oops, content not found.</i>"
 
     if not albumInfo.pageUrl:
-        html = markup + "<br/><i>Album not found.</i>" + hrline
+        html = markup + "<br/><i>Album not found.</i>"
     else:
-        html = markup + hrline
+        html = markup
 
     if contentSitename == 'allmusic'.lower():
         try:
@@ -114,6 +114,7 @@ def make_html(userRequest, urlCount):
     loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
     linebreak = "<br />"
     hrline = "<hr />"
+    segmented = False
 
     if urlCount == 1:
         html = "<p>" + markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8') + "</p>"
@@ -144,9 +145,11 @@ def make_html(userRequest, urlCount):
                 '" frameborder="0" allowfullscreen></iframe>'
 
         html = youtubeEmbed
+        segmented = True
 
     elif urlCount == 3:
         album = SpotifyEmbed(userRequest)
+        segmented = True
         try:
             album_uri = album.get_album_uri()
             html = album.generate_embed_code(album_uri) + hrline
@@ -172,9 +175,8 @@ def make_html(userRequest, urlCount):
         html = "<p>" + markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8') + "</p>"
 
     elif urlCount == 10:
-        html = markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8')
-        if html.endswith(hrline):
-            html = "<p>" + html[:-6] + "</p>"
+        html = "<p>" + markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8') + "</p>"
+        segmented = True
 
     #print albumInfo.allmusicMetadata
     #print
@@ -184,7 +186,10 @@ def make_html(userRequest, urlCount):
 
     #html = allmusicMarkup + hrline + rymMarkup + hrline + discogsMarkup + hrline + youtubeEmbed
 
-    return html
+    if segmented:
+        return html
+    else:
+        return html + hrline
 
 if __name__ == "__main__":
     make_html('live', 4)
