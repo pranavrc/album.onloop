@@ -84,9 +84,9 @@ def make_tracklist(songList, imageFile, genre, styles):
 
     if genre:
         if styles:
-            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + " (" + styles + ")</i><br/>"
+            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + " (" + styles + ")</i><br />"
         else:
-            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br/>"
+            albumGenre = "<b><i>Genre:</b></i> " + "<i>" + genre + "</i><br />"
     else:
         albumGenre = ""
 
