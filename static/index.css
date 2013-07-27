@@ -17,6 +17,10 @@ input {
 	width:100px;
 }
 
+p {
+	background: url('');
+}
+
 .content {
 	border-radius: 10px;
 	background-color: hsl(0,0%,90%);
