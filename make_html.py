@@ -73,9 +73,9 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
             info = ""
 
         if info:
-            html = "<div class=\"info\">" + info + "</div>" + hrline + html
+            html = "<div class=\"info\">" + info + "</div>" + hrline + "<p>" html + "</p>"
         else:
-            html = info + html
+            html = info + "<p>" + html + "</p>"
 
     return html
 
