@@ -22,7 +22,7 @@ function jsonParse() {
 		var decodedString = htmlDecode(randomString);
 		var formData;
 		formData = assignformString(decodedString);
-		sendRequest(1, 9, formData); //9 AJAX requests sequentially.
+		sendRequest(1, 10, formData); //10 AJAX requests sequentially.
 	});
 
 	return false;
