@@ -77,7 +77,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
         else:
             html = info + html
 
-    return html
+    return "<p>" + html + "</p>"
 
 def make_tracklist(songList, imageFile, genre, styles):
     tracklisting = "<b><i>Track Listing:</b></i><br/>"
@@ -173,8 +173,8 @@ def make_html(userRequest, urlCount):
 
     elif urlCount == 10:
         html = markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8')
-        if html.endswith(hrline):
-            html = html[:-6]
+        if html.endswith(hrline + "</p>"):
+            html = html[:-10] + "</p>"
 
     #print albumInfo.allmusicMetadata
     #print
