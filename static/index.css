@@ -33,8 +33,15 @@ input {
 	text-shadow: hsla(0,0%,40%,.5) 0 -1px 0, hsla(0,0%,100%,.6) 0 2px 1px;
 }
 
-img {
-	vertical-align: middle;
+.info {
+	margin: auto;
+	text-align: center;
+	width: 100%;
+}
+
+.albumart {
+   padding:1px;
+   border:1px solid #021a40;
 }
 
 .formDiv {
