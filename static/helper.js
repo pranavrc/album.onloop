@@ -41,12 +41,12 @@ function assignformString(albumChosen) {
 
 /* Send AJAX requests to server */
 function sendRequest(count, maxCount, formData) {
-	if (count == 1) $('div.myDiv').html("<img class=\"loader\" src=\"/static/loader.gif\" alt=\"Fetching...\" />");
-	else $('div.myDiv').append("<img class=\"loader\" src=\"/static/loader.gif\" alt=\"Fetching...\" />");
+	if (count == 1) $('div.content').html("<img class=\"loader\" src=\"/static/loader.gif\" alt=\"Fetching...\" />");
+	else $('div.content').append("<img class=\"loader\" src=\"/static/loader.gif\" alt=\"Fetching...\" />");
 
 	if (requests) requests.abort();
 	requests = $.ajax({type:'POST', url: '/', data:{"query": formData, "count": count}, success: function(response) {
-			if (count == 1) { $('div.myDiv').html(response); }
+			if (count == 1) { $('div.content').html(response); }
 			else { $('img.loader').replaceWith(response); }
 			count++;
 			if (count <= maxCount) {
