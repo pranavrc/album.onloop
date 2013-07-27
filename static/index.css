@@ -72,6 +72,8 @@ fieldset {
 }
 
 hr {
+	margin-top: 10px;
+	margin-bottom: 10px;
 	color: white;
 	border: 0;
     height: 1px;
