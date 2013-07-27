@@ -5,6 +5,7 @@ from album_metadata import *
 from random import choice
 from yt_fetch import *
 import string
+from spotify_playlist import SpotifyEmbed 
 
 def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
     loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
@@ -158,9 +159,17 @@ def make_html(userRequest, urlCount):
         if not randomSongChosen:
             return "<i>Youtube Video not found.</i>"
 
-        youtubeEmbed = '<iframe title="Youtube video player" width="420" height="315" src="http://www.youtube.com/embed/' + randomSongChosen + '" frameborder="0" allowfullscreen></iframe>'
+        youtubeEmbed = '<iframe title="Youtube video player" width="380" height="380" src="http://www.youtube.com/embed/' + randomSongChosen + '" frameborder="0" allowfullscreen></iframe>'
 
         html = youtubeEmbed
+    
+    elif urlCount == 10:
+        album = SpotifyEmbed(userRequest)
+        try:
+            album_uri = album.get_album_uri()
+            html = album.generate_embed_code(album_uri)
+        except:
+            html = hrline + "<i>Album not found on Spotify.</i>"
 
     #print albumInfo.allmusicMetadata
     #print
