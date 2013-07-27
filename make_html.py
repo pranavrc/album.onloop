@@ -77,7 +77,7 @@ def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
         else:
             html = info + html
 
-    return "<p>" + html + "</p>"
+    return html
 
 def make_tracklist(songList, imageFile, genre, styles):
     tracklisting = "<b><i>Track Listing:</b></i><br/>"
@@ -116,7 +116,7 @@ def make_html(userRequest, urlCount):
     hrline = "<hr />"
 
     if urlCount == 1:
-        html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8') + "</p>"
 
     elif urlCount == 2:
         htmlfoo = albumInfo.search(userRequest, 'allmusic')
@@ -154,27 +154,27 @@ def make_html(userRequest, urlCount):
             html = hrline + "<i>Album not found on Spotify.</i>" + hrline
 
     elif urlCount == 4:
-        html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse, 'utf-8') + "</p>"
 
     elif urlCount == 5:
-        html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse, 'utf-8') + "</p>"
 
     elif urlCount == 6:
-        html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8') + "</p>"
 
     elif urlCount == 7:
-        html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8') + "</p>"
 
     elif urlCount == 8:
-        html = markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8') + "</p>"
 
     elif urlCount == 9:
-        html = markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8')
+        html = "<p>" + markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8') + "</p>"
 
     elif urlCount == 10:
         html = markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8')
-        if html.endswith(hrline + "</p>"):
-            html = html[:-10] + "</p>"
+        if html.endswith(hrline):
+            html = "<p>" + html[:-6] + "</p>"
 
     #print albumInfo.allmusicMetadata
     #print
