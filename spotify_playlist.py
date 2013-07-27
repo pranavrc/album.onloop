@@ -19,7 +19,7 @@ class SpotifyEmbed:
     def generate_embed_code(self, album_id):
         ''' Embed code for iframe.'''
         embed_code = '<iframe src="https://embed.spotify.com/?uri=%s" ' % album_id + \
-                'width="300" height="380" frameborder="0" allowtransparency="true"></iframe>'
+                'width="50%" height="380" frameborder="0" allowtransparency="true"></iframe>'
         return embed_code
 
 if __name__ == "__main__":

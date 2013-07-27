@@ -139,7 +139,7 @@ def make_html(userRequest, urlCount):
         if not randomSongChosen:
             return "<i>Youtube Video not found.</i>"
 
-        youtubeEmbed = '<iframe title="Youtube video player" width="380" height="380" ' + \
+        youtubeEmbed = '<iframe title="Youtube video player" width="50%" height="380" ' + \
                 'src="http://www.youtube.com/embed/' + randomSongChosen + \
                 '" frameborder="0" allowfullscreen></iframe>'
 
