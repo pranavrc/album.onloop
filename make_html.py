@@ -5,7 +5,7 @@ from album_metadata import *
 from random import choice
 from yt_fetch import *
 import string
-from spotify_playlist import SpotifyEmbed 
+from spotify_playlist import SpotifyEmbed
 
 def markup(userRequest, albumInfo, contentSite, parseFunc, encoding):
     loadergif = "<img class=\"loader\" src=\"{{ url_for('static', filename='loader.gif') }}\" alt=\"Publishing...\" />"
@@ -103,7 +103,7 @@ def make_tracklist(songList, imageFile, genre, styles):
         albumpic = "<img class=\"albumart\" width=\"200\" height=\"200\" src=\"" + imageFile + "\" alt=\"Album Art\" /><br />"
     else:
         albumpic = ""
-    
+
     html = str(albumpic) + str(albumGenre) + str(tracklisting)
     return html
 
@@ -118,27 +118,6 @@ def make_html(userRequest, urlCount):
         html = markup(userRequest, albumInfo, 'allmusic', albumInfo.allmusic_parse, 'utf-8')
 
     elif urlCount == 2:
-        html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse, 'utf-8')
-
-    elif urlCount == 3:
-        html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse, 'utf-8')
-
-    elif urlCount == 4:
-        html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8')
-
-    elif urlCount == 5:
-        html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8')
-
-    elif urlCount == 6:
-        html = markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8')
-
-    elif urlCount == 7:
-        html = markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8')
-
-    elif urlCount == 8:
-        html = markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8')
-
-    elif urlCount == 9:
         htmlfoo = albumInfo.search(userRequest, 'allmusic')
         albumInfo.allmusic_parse(htmlfoo, getAlbumArt = False, getGenre = False, getStyles = False)
 
@@ -159,17 +138,42 @@ def make_html(userRequest, urlCount):
         if not randomSongChosen:
             return "<i>Youtube Video not found.</i>"
 
-        youtubeEmbed = '<iframe title="Youtube video player" width="380" height="380" src="http://www.youtube.com/embed/' + randomSongChosen + '" frameborder="0" allowfullscreen></iframe>'
+        youtubeEmbed = '<iframe title="Youtube video player" width="380" height="380" ' + \
+                'src="http://www.youtube.com/embed/' + randomSongChosen + \
+                '" frameborder="0" allowfullscreen></iframe>'
 
         html = youtubeEmbed
-    
-    elif urlCount == 10:
+
+    elif urlCount == 3:
         album = SpotifyEmbed(userRequest)
         try:
             album_uri = album.get_album_uri()
-            html = album.generate_embed_code(album_uri)
+            html = album.generate_embed_code(album_uri) + hrline
         except:
-            html = hrline + "<i>Album not found on Spotify.</i>"
+            html = hrline + "<i>Album not found on Spotify.</i>" + hrline
+
+    elif urlCount == 4:
+        html = markup(userRequest, albumInfo, 'rateyourmusic', albumInfo.rym_parse, 'utf-8')
+
+    elif urlCount == 5:
+        html = markup(userRequest, albumInfo, 'discogs', albumInfo.discogs_parse, 'utf-8')
+
+    elif urlCount == 6:
+        html = markup(userRequest, albumInfo, 'itunes', albumInfo.itunes_parse, 'utf-8')
+
+    elif urlCount == 7:
+        html = markup(userRequest, albumInfo, 'pitchfork', albumInfo.pitchfork_parse, 'utf-8')
+
+    elif urlCount == 8:
+        html = markup(userRequest, albumInfo, 'sputnikmusic', albumInfo.sputnikmusic_parse, 'utf-8')
+
+    elif urlCount == 9:
+        html = markup(userRequest, albumInfo, 'rollingstone', albumInfo.rs_parse, 'utf-8')
+
+    elif urlCount == 10:
+        html = markup(userRequest, albumInfo, 'metacritic', albumInfo.metacritic_parse, 'utf-8')
+        if html.endswith(hrline):
+            html = html[:-6]
 
     #print albumInfo.allmusicMetadata
     #print
